@@ -1,0 +1,21 @@
+{
+  "name": "ollama-web",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "discord-interactions": "^4.4.0",
+    "express": "^5.2.1",
+    "node-fetch": "^3.3.2"
+  },
+  "directories": {
+    "test": "tests"
+  }
+}

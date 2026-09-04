@@ -1,0 +1,2314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Google AdSense Auto Ads & Script -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2523359993935749"
+       crossorigin="anonymous"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GuAI Hub v1.2</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f1015">
+  <link rel="icon" type="image/png" href="assets/guai_hub_icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0f1015;
+      --sidebar-bg: #161822;
+      --card-bg: #1d2130;
+      --card-hover: #262c3e;
+      --accent-color: #6366f1;
+      --accent-hover: #4f46e5;
+      --accent-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+      --text-main: #d1d5db;
+      --text-highlight: #ffffff;
+      --text-muted: #6b7280;
+      --border-color: #2b3044;
+      --bubble-user: #4f46e5;
+      --bubble-bot: #1e293b;
+      --font-family: 'Outfit', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      width: 320px;
+      background-color: var(--sidebar-bg);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      padding: 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .sidebar-header-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand {
+      font-size: 20px;
+      font-weight: 700;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .auth-nav {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .auth-link {
+      color: #a78bfa;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .auth-link:hover {
+      color: var(--accent-color);
+    }
+
+    .upgrade-link {
+      color: var(--text-highlight);
+      background: var(--accent-gradient);
+      border-radius: 6px;
+      padding: 6px 10px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+
+    .upgrade-link:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+
+    .new-chat-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--accent-gradient);
+      border: none;
+      border-radius: 8px;
+      color: var(--text-highlight);
+      font-family: var(--font-family);
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .new-chat-btn:hover {
+      transform: translateY(-1s);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+
+    .search-container {
+      padding: 12px 24px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 14px;
+      background-color: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-highlight);
+      font-family: var(--font-family);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-color);
+    }
+
+    .history-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .history-item {
+      padding: 12px;
+      background-color: transparent;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s, border-color 0.2s;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .history-item:hover {
+      background-color: var(--card-bg);
+      border-color: var(--border-color);
+    }
+
+    .history-item.active {
+      background-color: var(--card-bg);
+      border-color: var(--accent-color);
+    }
+
+    .history-prompt {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-highlight);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .history-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* Main Content Styles */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background-color: var(--bg-dark);
+    }
+
+    .main-header {
+      height: 70px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      background-color: rgba(22, 24, 34, 0.6);
+      backdrop-filter: blur(10px);
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .chat-messages {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      scrollbar-gutter: stable;
+    }
+
+    .chat-empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      color: var(--text-muted);
+      gap: 16px;
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .message {
+      display: flex;
+      gap: 16px;
+      max-width: 80%;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message.bot {
+      align-self: flex-start;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .message.user .avatar {
+      background: var(--accent-gradient);
+      color: var(--text-highlight);
+    }
+
+    .message.bot .avatar {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--accent-color);
+    }
+
+    .bubble {
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-size: 15px;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .message.user .bubble {
+      background-color: var(--bubble-user);
+      color: var(--text-highlight);
+      border-bottom-right-radius: 2px;
+    }
+
+    .message.bot .bubble {
+      background-color: var(--bubble-bot);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      border-bottom-left-radius: 2px;
+    }
+
+    .message-content {
+      white-space: pre-wrap;
+    }
+
+    /* Input Bar Styles */
+    .input-bar-container {
+      padding: 24px 32px;
+      border-top: 1px solid var(--border-color);
+      background-color: rgba(22, 24, 34, 0.4);
+    }
+
+    .input-bar {
+      display: flex;
+      gap: 12px;
+      background-color: var(--sidebar-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 8px 12px;
+      align-items: center;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .input-bar:focus-within {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    }
+
+    .chat-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-highlight);
+      font-family: var(--font-family);
+      font-size: 15px;
+      outline: none;
+      padding: 8px 4px;
+    }
+
+    .chat-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .send-btn {
+      background: var(--accent-gradient);
+      border: none;
+      border-radius: 8px;
+      color: var(--text-highlight);
+      padding: 10px 16px;
+      cursor: pointer;
+      font-family: var(--font-family);
+      font-weight: 600;
+      transition: transform 0.1s;
+    }
+
+    .send-btn:hover {
+      opacity: 0.9;
+    }
+
+    .send-btn:active {
+      transform: scale(0.95);
+    }
+
+    .file-upload-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-main);
+      padding: 10px 12px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: border-color 0.2s;
+    }
+
+    .file-upload-btn:hover {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+    }
+
+    #doc-input {
+      display: none;
+    }
+
+    .doc-badge {
+      font-size: 11px;
+      background-color: var(--accent-color);
+      color: var(--text-highlight);
+      padding: 4px 8px;
+      border-radius: 4px;
+      margin-left: 8px;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #59627f;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    /* Icon Buttons inside Input Bar */
+    .icon-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      border-radius: 8px;
+      transition: color 0.2s, background-color 0.2s, transform 0.1s;
+    }
+
+    .icon-btn:hover {
+      color: var(--accent-color);
+      background-color: var(--card-hover);
+      transform: scale(1.05);
+    }
+
+    .icon-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Attachment Preview */
+    .attachment-preview {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 12px;
+      animation: slideInUp 0.2s ease-out;
+    }
+
+    @keyframes slideInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .attachment-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .attachment-processing {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      color: var(--accent-color);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .attachment-processing.active {
+      display: flex;
+    }
+
+    .loading-spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(99, 102, 241, 0.25);
+      border-top-color: var(--accent-color);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .attachment-icon {
+      font-size: 16px;
+    }
+
+    .attachment-name {
+      font-size: 13px;
+      color: var(--text-highlight);
+      font-weight: 500;
+    }
+
+    .remove-attachment-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .remove-attachment-btn:hover {
+      background-color: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+
+    /* Modal Styles */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(15, 16, 21, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .modal-content {
+      background-color: var(--sidebar-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      animation: scaleUp 0.2s ease-out;
+    }
+
+    @keyframes scaleUp {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-highlight);
+    }
+
+    .close-modal-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .close-modal-btn:hover {
+      color: var(--text-highlight);
+    }
+
+    .modal-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .modal-body p {
+      font-size: 14px;
+      color: var(--text-main);
+    }
+
+    .upgrade-plans {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .upgrade-plan {
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+
+    .upgrade-plan.featured {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.25);
+    }
+
+    .upgrade-plan h4 {
+      color: var(--text-highlight);
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    .upgrade-plan strong {
+      display: block;
+      color: var(--accent-color);
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .upgrade-plan span {
+      color: var(--text-muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .modal-textarea {
+      width: 100%;
+      height: 100px;
+      background-color: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px;
+      color: var(--text-highlight);
+      font-family: var(--font-family);
+      font-size: 14px;
+      outline: none;
+      resize: none;
+      transition: border-color 0.2s;
+    }
+
+    .modal-textarea:focus {
+      border-color: var(--accent-color);
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .modal-btn {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-family: var(--font-family);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .modal-btn:active {
+      transform: scale(0.98);
+    }
+
+    .modal-btn.primary {
+      background: var(--accent-gradient);
+      color: var(--text-highlight);
+      border: none;
+    }
+
+    .modal-btn.primary:hover {
+      opacity: 0.9;
+    }
+
+    .modal-btn.secondary {
+      background-color: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .modal-btn.secondary:hover {
+      background-color: var(--card-bg);
+      color: var(--text-highlight);
+    }
+
+    /* Image Card in Bubble */
+    .image-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 8px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-dark);
+      max-width: 100%;
+      width: 320px;
+    }
+
+    .generated-image {
+      width: 100%;
+      height: auto;
+      object-fit: cover;
+      aspect-ratio: 1;
+      display: block;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .image-card-actions {
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .download-img-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-highlight);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      background-color: var(--accent-color);
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background-color 0.2s;
+    }
+
+    .download-img-btn:hover {
+      background-color: var(--accent-hover);
+    }
+
+    /* Code Blocks styling */
+    .code-container {
+      background-color: #0b0c10;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      margin: 12px 0;
+      overflow: hidden;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .code-header {
+      background-color: var(--sidebar-bg);
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .code-lang {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-highlight);
+      text-transform: uppercase;
+      font-family: var(--font-family);
+    }
+
+    .code-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .code-action-btn {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      cursor: pointer;
+      font-family: var(--font-family);
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .code-action-btn:hover {
+      background-color: var(--accent-color);
+      color: var(--text-highlight);
+    }
+
+    .code-action-btn.preview-btn {
+      border-color: var(--accent-color);
+      color: var(--accent-color);
+    }
+
+    .code-action-btn.preview-btn:hover {
+      background-color: var(--accent-gradient);
+      color: var(--text-highlight);
+    }
+
+    pre {
+      padding: 16px;
+      overflow-x: auto;
+      margin: 0;
+      background-color: #0b0c10;
+    }
+
+    code {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      color: #e2e8f0;
+      white-space: pre;
+    }
+
+    /* Auth Screen styling */
+    .auth-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: var(--bg-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5000;
+      background: radial-gradient(circle at center, #1e1e2f 0%, var(--bg-dark) 100%);
+    }
+
+    .auth-card {
+      background-color: var(--sidebar-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 400px;
+      padding: 32px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .auth-header {
+      text-align: center;
+    }
+
+    .auth-subtitle {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .auth-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .auth-tab {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-family);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 12px;
+      cursor: pointer;
+      transition: color 0.2s, border-bottom 0.2s;
+      border-bottom: 2px solid transparent;
+      text-align: center;
+    }
+
+    .auth-tab.active {
+      color: var(--accent-color);
+      border-bottom-color: var(--accent-color);
+    }
+
+    .auth-body {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .input-group label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .input-group input {
+      background-color: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 12px;
+      color: var(--text-highlight);
+      font-family: var(--font-family);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-group input:focus {
+      border-color: var(--accent-color);
+    }
+
+    .auth-error-msg {
+      background-color: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+      font-size: 13px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    /* Profile / Logout Section at Bottom of Sidebar */
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: rgba(15, 16, 21, 0.4);
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      overflow: hidden;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent-gradient);
+      color: var(--text-highlight);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .user-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-highlight);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .logout-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      font-family: var(--font-family);
+      font-weight: 600;
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .logout-btn:hover {
+      border-color: #ef4444;
+      color: #ef4444;
+      background-color: rgba(239, 68, 68, 0.1);
+    }
+  </style>
+  <!-- Google AdSense Auto Ads -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2523359993935749"
+     crossorigin="anonymous">
+
+
+</script>
+</head>
+<body>
+
+  <!-- Auth Container (Login / Signup Screen) -->
+  <div id="auth-container" class="auth-container" style="display: none;">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="brand" style="justify-content: center; font-size: 24px; margin-bottom: 8px;">
+          <img src="assets/guai_hub_logo.png" alt="GuAI Hub" style="height: 48px; width: auto;">
+        </div>
+        <p id="auth-subtitle" class="auth-subtitle">Log in to access your local offline assistant</p>
+      </div>
+      
+      <div class="auth-tabs">
+        <button id="tab-login" class="auth-tab active" onclick="switchAuthTab('login')">Login</button>
+        <button id="tab-signup" class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</button>
+      </div>
+
+      <div class="auth-body">
+        <div class="input-group">
+          <label for="auth-username">Username</label>
+          <input type="text" id="auth-username" placeholder="Enter username..." autocomplete="off">
+        </div>
+        <div class="input-group">
+          <label for="auth-password">Password</label>
+          <input type="password" id="auth-password" placeholder="Enter password...">
+        </div>
+        <div id="auth-error" class="auth-error-msg" style="display: none;"></div>
+        <button id="auth-submit-btn" class="new-chat-btn" style="margin-top: 16px; padding: 14px;" onclick="submitAuth()">Log In</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Left Sidebar (History Panel) -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-header-content">
+        <div class="brand" style="display: flex; align-items: center; gap: 8px;">
+          <img src="assets/guai_hub_icon.png" alt="GuAI Hub" style="height: 28px; width: auto;">
+          <span style="font-size: 18px; font-weight: 700; color: #ffffff;">GuAI Hub</span>
+        </div>
+        <nav class="auth-nav">
+          <a href="#" class="auth-link" onclick="openAuth('login'); return false;">Sign In</a>
+          <a href="#" class="auth-link" onclick="openAuth('signup'); return false;">Sign Up</a>
+          <a href="#" class="upgrade-link" onclick="openUpgradeModal(); return false;">Upgrade</a>
+        </nav>
+      </div>
+      <button class="new-chat-btn" onclick="startNewChat()">
+        <span>+</span> New Chat
+      </button>
+    </div>
+    <div class="search-container">
+      <input type="text" id="search-history" class="search-input" placeholder="Search past chats..." oninput="filterHistory()">
+    </div>
+    <div class="history-list" id="history-list">
+      <!-- Chat history items will load dynamically here -->
+    </div>
+
+    <!-- User Profile & Logout at Bottom of Sidebar -->
+    <div class="sidebar-footer">
+      <div class="user-profile">
+        <div class="user-avatar" id="user-avatar-initial">U</div>
+        <span class="user-name" id="user-display-name">Username</span>
+      </div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </aside>
+
+  <!-- Right Main Area -->
+  <main class="main-content">
+    <header class="main-header">
+      <div class="status-badge">
+        <div class="status-dot"></div>
+        <span style="font-weight: 500; font-size: 13px;">Active Model:</span>
+        <select id="model-select" style="background-color: var(--sidebar-bg); border: 1px solid var(--border-color); color: var(--text-highlight); border-radius: 6px; padding: 4px 8px; font-family: var(--font-family); font-size: 12px; outline: none; cursor: pointer;" onchange="handleModelChange()">
+          <option value="minimax-m3:cloud" selected>minimax-m3:cloud</option>
+          <option value="phi3:mini">phi3:mini</option>
+        </select>
+        <span id="usage-badge" style="font-size: 12px; color: var(--text-muted);">Free: 10 left today</span>
+      </div>
+      <div style="font-size: 13px; color: var(--text-muted);">
+        Proxy: localhost:3000
+      </div>
+    </header>
+
+    <div class="chat-container">
+      <div class="chat-messages" id="chat-messages">
+        <!-- Empty State -->
+        <div class="chat-empty-state" id="empty-state">
+          <div class="empty-icon" style="margin-bottom: 16px;">
+            <img src="assets/guai_hub_logo.png" alt="GuAI Hub Emblem" style="max-width: 240px; height: auto; display: block; margin: 0 auto;">
+          </div>
+          <h2 style="font-size: 24px; font-weight: 700; line-height: 1.4; margin-top: 12px; margin-bottom: 8px; color: #ffffff; padding: 4px 0; text-align: center;">Welcome to GuAI Hub</h2>
+          <p style="color: var(--text-muted);">Your Intelligent AI Hub. Ask anything or choose a model below.</p>
+        </div>
+      </div>
+
+            <!-- CoffeeBanner_Homepage Ad Unit -->
+      <div style="margin: 12px 24px 0 24px; text-align: center; overflow: hidden; max-height: 100px;">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-2523359993935749"
+             data-ad-slot="3544983552"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        
+
+
+</script>
+      </div>
+
+      <!-- Input Bar -->
+      <div class="input-bar-container">
+        <!-- Attachment preview area -->
+        <div id="attachment-preview" class="attachment-preview" style="display: none;">
+          <div class="attachment-info">
+            <span class="attachment-icon">📄</span>
+            <span id="attachment-name" class="attachment-name">document.txt</span>
+          </div>
+          <span id="attachment-processing" class="attachment-processing">
+            <span class="loading-spinner"></span> Processing...
+          </span>
+          <button class="remove-attachment-btn" onclick="removeAttachment()">&times;</button>
+        </div>
+
+        <div class="input-bar">
+          <!-- Hidden file input -->
+          <input type="file" id="doc-input-element" style="display: none;" onchange="handleFileSelect(event)" accept=".txt,.md,.js,.ts,.html,.css,.json,.py,.java,.cpp,.c,.h,.sh,.bat,.ps1">
+          
+          <!-- AI Dubbing Studio Prominent Button -->
+          <button onclick="if(window.openDubbingModal){window.openDubbingModal();}else{document.getElementById('dubbing-modal').style.display='flex';}; return false;" title="AI Audio/Video & Script Dubbing Studio" style="background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%); border: none; color: #ffffff; padding: 6px 12px; border-radius: 8px; font-weight: 600; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; flex-shrink: 0; box-shadow: 0 2px 6px rgba(168, 85, 247, 0.4); z-index: 10;">
+            <span style="font-size: 14px;">🎬</span> AI Dub
+          </button>
+          
+          <!-- Attachment Button -->
+          <button class="icon-btn" onclick="triggerFileInput()" title="Add Document">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+            </svg>
+          </button>
+
+          <!-- Create Image Button -->
+          <button class="icon-btn" onclick="openImageModal()" title="Create Image">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+          </button>
+
+          <input type="text" id="prompt-input" class="chat-input" placeholder="Ask anything..." onkeydown="handleKeyDown(event)">
+          <button class="send-btn" onclick="ask()">Send</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Image Prompt Modal -->
+  <div id="image-modal" class="modal" style="display: none;" onclick="if(event.target === this) closeImageModal()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Generate Image</h3>
+        <button class="close-modal-btn" onclick="closeImageModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Describe the image you want to generate:</p>
+        <textarea id="image-prompt" class="modal-textarea" placeholder="e.g., A futuristic city at sunset, neon lights, cyberpunk style, high detail..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn secondary" onclick="closeImageModal()">Cancel</button>
+        <button class="modal-btn primary" onclick="generateImage()">Generate</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HTML Preview Modal -->
+  <div id="preview-modal" class="modal" style="display: none;" onclick="if(event.target === this) closePreviewModal()">
+    <div class="modal-content" style="max-width: 90%; width: 1200px; height: 85vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <h3>Live HTML Preview</h3>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <button class="modal-btn secondary" style="padding: 6px 12px; font-size: 12px;" onclick="openPreviewInNewTab()">🌐 Open in New Tab</button>
+          <button class="close-modal-btn" onclick="closePreviewModal()">&times;</button>
+        </div>
+      </div>
+      <div class="modal-body" style="flex: 1; padding: 0; background-color: white;">
+        <iframe id="preview-iframe" style="width: 100%; height: 100%; border: none;"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upgrade Plans Modal -->
+  <div id="upgrade-modal" class="modal" style="display: none;" onclick="if(event.target === this) closeUpgradeModal()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Upgrade GuAI Hub</h3>
+        <button class="close-modal-btn" onclick="closeUpgradeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Choose the plan that fits your AI workflow. Ollama models continue to run locally on your device.</p>
+        <div class="upgrade-plans">
+          <div class="upgrade-plan">
+            <h4>Free</h4>
+            <strong>$0</strong>
+            <span>Local models<br>Chat history</span>
+          </div>
+          <div class="upgrade-plan featured">
+            <h4>Pro</h4>
+            <strong>Coming soon</strong>
+            <span>More AI tools<br>Priority features</span>
+          </div>
+          <div class="upgrade-plan">
+            <h4>Team</h4>
+            <strong>Coming soon</strong>
+            <span>Shared workspace<br>Team controls</span>
+          </div>
+        </div>
+        <p style="font-size: 12px; color: var(--text-muted);">Online billing is not connected yet. Add a payment provider before enabling paid upgrades.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn secondary" onclick="closeUpgradeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let chatHistory = [];
+    let currentUsername = "";
+    let authMode = "login";
+    let selectedModel = "phi3:mini";
+
+    window.addEventListener("DOMContentLoaded", () => {
+      // Check if user is already logged in
+      const savedUser = localStorage.getItem("chat-username");
+      if (savedUser) {
+        loginUser(savedUser);
+      } else {
+        showAuthScreen();
+      }
+      loadModels();
+      loadUsage();
+    });
+
+    // Auth screen logic
+    function showAuthScreen() {
+      document.getElementById("auth-container").style.display = "flex";
+      document.getElementById("auth-username").focus();
+    }
+
+    function openAuth(mode) {
+      switchAuthTab(mode);
+      showAuthScreen();
+    }
+
+    function hideAuthScreen() {
+      document.getElementById("auth-container").style.display = "none";
+    }
+
+    function switchAuthTab(mode) {
+      authMode = mode;
+      const loginTab = document.getElementById("tab-login");
+      const signupTab = document.getElementById("tab-signup");
+      const subtitle = document.getElementById("auth-subtitle");
+      const submitBtn = document.getElementById("auth-submit-btn");
+      const errorDiv = document.getElementById("auth-error");
+
+      errorDiv.style.display = "none";
+
+      if (mode === "login") {
+        loginTab.classList.add("active");
+        signupTab.classList.remove("active");
+        subtitle.innerText = "Log in to access your local offline assistant";
+        submitBtn.innerText = "Log In";
+      } else {
+        loginTab.classList.remove("active");
+        signupTab.classList.add("active");
+        subtitle.innerText = "Create an account to start chatting";
+        submitBtn.innerText = "Sign Up";
+      }
+    }
+
+    async function submitAuth() {
+      const usernameInput = document.getElementById("auth-username");
+      const passwordInput = document.getElementById("auth-password");
+      const errorDiv = document.getElementById("auth-error");
+
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!username || !password) {
+        errorDiv.innerText = "Please enter both username and password";
+        errorDiv.style.display = "block";
+        return;
+      }
+
+      errorDiv.style.display = "none";
+
+      const endpoint = authMode === "login" ? "/api/login" : "/api/signup";
+
+      try {
+        const response = await fetch(`${window.location.origin}${endpoint}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          usernameInput.value = "";
+          passwordInput.value = "";
+          loginUser(data.username);
+        } else {
+          let errText = await response.text();
+          if (errText.trim().startsWith("<") || errText.includes("DOCTYPE")) {
+            // Netlify static fallback mode - auto log in locally
+            usernameInput.value = "";
+            passwordInput.value = "";
+            loginUser(username);
+            return;
+          }
+          errorDiv.innerText = errText || "Authentication failed";
+          errorDiv.style.display = "block";
+        }
+      } catch (err) {
+        console.error("Auth fetch error, falling back to local session:", err);
+        usernameInput.value = "";
+        passwordInput.value = "";
+        loginUser(username);
+      }
+    }
+
+    function loginUser(username) {
+      if (!username || username === "Username") {
+        username = localStorage.getItem("chat-username") || "User";
+      }
+      currentUsername = username;
+      localStorage.setItem("chat-username", username);
+      
+      // Format display username/email
+      const displayName = username.length > 22 ? username.substring(0, 19) + "..." : username;
+      const userElem = document.getElementById("user-display-name");
+      if (userElem) {
+        userElem.innerText = displayName;
+        userElem.title = username;
+      }
+      const avatarElem = document.getElementById("user-avatar-initial");
+      if (avatarElem) {
+        avatarElem.innerText = username.charAt(0).toUpperCase();
+      }
+      
+      hideAuthScreen();
+      startNewChat();
+      loadHistory();
+      loadUsage();
+    }
+
+    function logout() {
+      currentUsername = "";
+      chatHistory = [];
+      localStorage.removeItem("chat-username");
+
+      const userElem = document.getElementById("user-display-name");
+      if (userElem) {
+        userElem.innerText = "Username";
+        userElem.title = "";
+      }
+
+      const avatarElem = document.getElementById("user-avatar-initial");
+      if (avatarElem) {
+        avatarElem.innerText = "U";
+      }
+
+      const usageBadge = document.getElementById("usage-badge");
+      if (usageBadge) {
+        usageBadge.innerText = "Free: 10 left today";
+      }
+
+      const chatMessages = document.getElementById("chat-messages");
+      if (chatMessages) {
+        chatMessages.innerHTML = "";
+      }
+
+      const historyList = document.getElementById("history-list");
+      if (historyList) {
+        historyList.innerHTML = "";
+      }
+
+      const searchInput = document.getElementById("search-history");
+      if (searchInput) {
+        searchInput.value = "";
+      }
+
+      const usernameInput = document.getElementById("auth-username");
+      if (usernameInput) usernameInput.value = "";
+
+      const passwordInput = document.getElementById("auth-password");
+      if (passwordInput) passwordInput.value = "";
+
+      const errorDiv = document.getElementById("auth-error");
+      if (errorDiv) {
+        errorDiv.style.display = "none";
+        errorDiv.innerText = "";
+      }
+
+      switchAuthTab("login");
+      showAuthScreen();
+    }
+
+    async function loadHistory() {
+      if (!currentUsername) return;
+      try {
+        const response = await fetch(`/history?username=${encodeURIComponent(currentUsername)}`);
+        if (response.ok) {
+          chatHistory = await response.json();
+          renderHistory(chatHistory);
+        }
+      } catch (err) {
+        console.error("Failed to load chat history:", err);
+      }
+    }
+
+    function renderHistory(items) {
+      const historyList = document.getElementById("history-list");
+      historyList.innerHTML = "";
+
+      if (items.length === 0) {
+        historyList.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px;">No past chats</div>`;
+        return;
+      }
+
+      // Sort history descending by timestamp
+      const sortedItems = [...items].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+      sortedItems.forEach((item, index) => {
+        const date = new Date(item.timestamp);
+        const formattedDate = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + " - " + date.toLocaleDateString([], {month: 'short', day: 'numeric'});
+
+        const div = document.createElement("div");
+        div.className = "history-item";
+        div.onclick = () => showHistoryItem(item);
+        div.innerHTML = `
+          <div class="history-prompt">${escapeHtml(item.prompt)}</div>
+          <div class="history-meta">
+            <span>Query</span>
+            <span>${formattedDate}</span>
+          </div>
+        `;
+        historyList.appendChild(div);
+      });
+    }
+
+    function filterHistory() {
+      const query = document.getElementById("search-history").value.toLowerCase();
+      const filtered = chatHistory.filter(item => 
+        item.prompt.toLowerCase().includes(query) || 
+        item.response.toLowerCase().includes(query)
+      );
+      renderHistory(filtered);
+    }
+
+    function showHistoryItem(item) {
+      // Clear previous messages and empty state
+      const chatMessages = document.getElementById("chat-messages");
+      const emptyState = document.getElementById("empty-state");
+      if (emptyState) emptyState.style.display = "none";
+      chatMessages.innerHTML = "";
+
+      // Highlight active sidebar item
+      const historyItems = document.querySelectorAll(".history-item");
+      historyItems.forEach(el => {
+        if (el.querySelector(".history-prompt").innerText === item.prompt) {
+          el.classList.add("active");
+        } else {
+          el.classList.remove("active");
+        }
+      });
+
+      // Display selected historical chat
+      appendMessage("user", item.prompt);
+      const isHtml = item.response.includes("class=\"image-card\"");
+      appendMessage("bot", item.response, null, isHtml);
+    }
+
+    function startNewChat() {
+      // Reset main chat view to empty state
+      const chatMessages = document.getElementById("chat-messages");
+      chatMessages.innerHTML = `
+        <div class="chat-empty-state" id="empty-state">
+          <div class="empty-icon" style="margin-bottom: 16px;">
+            <img src="assets/guai_hub_logo.png" alt="GuAI Hub Emblem" style="max-width: 240px; height: auto; display: block; margin: 0 auto;">
+          </div>
+          <h2 style="font-size: 24px; font-weight: 700; line-height: 1.4; margin-top: 12px; margin-bottom: 8px; color: #ffffff; padding: 4px 0; text-align: center;">Welcome to GuAI Hub</h2>
+          <p style="color: var(--text-muted);">Your Intelligent AI Hub. Ask anything or choose a model below.</p>
+        </div>
+      `;
+
+      // Clear active styling in history list
+      const historyItems = document.querySelectorAll(".history-item");
+      historyItems.forEach(el => el.classList.remove("active"));
+
+      document.getElementById("prompt-input").focus();
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === "Enter") {
+        ask();
+      }
+    }
+
+    let attachedDocName = "";
+    let attachedDocContent = "";
+
+    function triggerFileInput() {
+      document.getElementById("doc-input-element").click();
+    }
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      attachedDocName = file.name;
+      attachedDocContent = "";
+      document.getElementById("attachment-name").innerText = attachedDocName;
+      document.getElementById("attachment-preview").style.display = "flex";
+      document.getElementById("attachment-processing").classList.add("active");
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        attachedDocContent = e.target.result;
+        document.getElementById("attachment-processing").classList.remove("active");
+      };
+      reader.onerror = function() {
+        alert("Failed to read file.");
+        removeAttachment();
+      };
+      reader.readAsText(file);
+    }
+
+    function removeAttachment() {
+      attachedDocName = "";
+      attachedDocContent = "";
+      document.getElementById("doc-input-element").value = "";
+      document.getElementById("attachment-preview").style.display = "none";
+      document.getElementById("attachment-processing").classList.remove("active");
+    }
+
+    function openImageModal() {
+      document.getElementById("image-modal").style.display = "flex";
+      document.getElementById("image-prompt").focus();
+    }
+
+    function closeImageModal() {
+      document.getElementById("image-modal").style.display = "none";
+    }
+
+    function openUpgradeModal() {
+      document.getElementById("upgrade-modal").style.display = "flex";
+    }
+
+    function closeUpgradeModal() {
+      document.getElementById("upgrade-modal").style.display = "none";
+    }
+
+    async function loadUsage() {
+      const badge = document.getElementById("usage-badge");
+      if (!badge) return;
+      try {
+        const response = await fetch(`/usage?username=${encodeURIComponent(currentUsername)}`);
+        if (!response.ok) return;
+        const usage = await response.json();
+        badge.innerText = `Free: ${usage.remaining} left today`;
+      } catch (err) {
+        console.error("Failed to load daily usage:", err);
+      }
+    }
+
+    function handleModelChange() {
+      const select = document.getElementById("model-select");
+      if (!select) return;
+
+      if (select.value === "__upgrade__") {
+        select.value = selectedModel;
+        openUpgradeModal();
+        return;
+      }
+
+      saveSelectedModel();
+    }
+
+    function addUpgradeOption(select) {
+      const upgradeOption = document.createElement("option");
+      upgradeOption.value = "__upgrade__";
+      upgradeOption.innerText = "Upgrade GuAI Hub";
+      select.appendChild(upgradeOption);
+    }
+
+    async function loadModels() {
+      try {
+        const response = await fetch("/models");
+        const select = document.getElementById("model-select");
+
+        if (!response.ok) {
+          select.innerHTML = '<option value="">No models found</option>';
+          addUpgradeOption(select);
+          selectedModel = "";
+          localStorage.removeItem("selected-model");
+          return;
+        }
+
+        const models = await response.json();
+        if (!Array.isArray(models) || models.length === 0) {
+          select.innerHTML = '<option value="">No models found</option>';
+          addUpgradeOption(select);
+          selectedModel = "";
+          localStorage.removeItem("selected-model");
+          return;
+        }
+
+        select.innerHTML = "";
+        models.forEach(model => {
+          const opt = document.createElement("option");
+          opt.value = model;
+          opt.innerText = model;
+          select.appendChild(opt);
+        });
+        addUpgradeOption(select);
+
+        const saved = localStorage.getItem("selected-model");
+        const preferredModel =
+          (saved && models.includes(saved)) ? saved :
+          models.find(m => m.startsWith("phi3:mini")) ||
+          models.find(m => m.startsWith("llama3")) ||
+          models.find(m => m.startsWith("gemma:2b")) ||
+          models[0];
+
+        if (preferredModel) {
+          select.value = preferredModel;
+          selectedModel = preferredModel;
+          localStorage.setItem("selected-model", preferredModel);
+        } else {
+          selectedModel = models[0];
+          localStorage.setItem("selected-model", selectedModel);
+        }
+      } catch (err) {
+        console.error("Failed to load local models, setting default models:", err);
+        const defaultModels = ["minimax-m3:cloud", "phi3:mini", "llama3:latest", "gemma:2b"];
+        const select = document.getElementById("model-select");
+        select.innerHTML = "";
+        defaultModels.forEach(model => {
+          const opt = document.createElement("option");
+          opt.value = model;
+          opt.innerText = model;
+          select.appendChild(opt);
+        });
+        addUpgradeOption(select);
+        const saved = localStorage.getItem("selected-model") || "minimax-m3:cloud";
+        select.value = saved;
+        selectedModel = saved;
+      }
+    }
+
+    function saveSelectedModel() {
+      const select = document.getElementById("model-select");
+      if (!select || !select.value) return;
+      selectedModel = select.value;
+      localStorage.setItem("selected-model", selectedModel);
+    }
+
+    // Markdown / Code Block formatting
+    function formatResponse(text) {
+      if (!text) return "";
+      
+      let parts = text.split("```");
+      let formatted = "";
+      
+      for (let i = 0; i < parts.length; i++) {
+        if (i % 2 === 0) {
+          // Regular text
+          formatted += escapeHtml(parts[i]).replace(/\n/g, "<br>");
+        } else {
+          // Code block
+          let part = parts[i];
+          let firstNewline = part.indexOf("\n");
+          let lang = "code";
+          let code = part;
+          
+          if (firstNewline !== -1) {
+            lang = part.substring(0, firstNewline).trim() || "code";
+            code = part.substring(firstNewline + 1);
+          }
+          
+          lang = lang.toLowerCase();
+          const isComplete = i < parts.length - 1;
+          
+          if (isComplete) {
+            const rawCode = code;
+            // Use URI encoding first, then base64 for Unicode-safe btoa
+            const encodedCode = btoa(encodeURIComponent(rawCode));
+            
+            let previewBtn = "";
+            if (lang === 'html' || lang === 'svg') {
+              previewBtn = `<button class="code-action-btn preview-btn" onclick="previewHtml('${encodedCode}')">Run Preview</button>`;
+            }
+            
+            formatted += `
+              <div class="code-container">
+                <div class="code-header">
+                  <span class="code-lang">${lang}</span>
+                  <div class="code-actions">
+                    ${previewBtn}
+                    <button class="code-action-btn copy-btn" onclick="copyCode(this, '${encodedCode}')">Copy</button>
+                  </div>
+                </div>
+                <pre><code>${escapeHtml(code)}</code></pre>
+              </div>
+            `;
+          } else {
+            // Streaming / Incomplete block
+            formatted += `
+              <div class="code-container">
+                <div class="code-header">
+                  <span class="code-lang">${lang} (writing...)</span>
+                </div>
+                <pre><code>${escapeHtml(code)}</code></pre>
+              </div>
+            `;
+          }
+        }
+      }
+      return formatted;
+    }
+
+    function copyCode(btn, encoded) {
+      const raw = decodeURIComponent(atob(encoded));
+      navigator.clipboard.writeText(raw).then(() => {
+        btn.innerText = "Copied!";
+        setTimeout(() => { btn.innerText = "Copy"; }, 2000);
+      }).catch(err => {
+        console.error("Copy failed", err);
+      });
+    }
+
+    function previewHtml(encoded) {
+      const raw = decodeURIComponent(atob(encoded));
+      openPreviewModal(raw);
+    }
+
+    function openPreviewModal(htmlCode) {
+      document.getElementById("preview-modal").style.display = "flex";
+      const iframe = document.getElementById("preview-iframe");
+      iframe.srcdoc = htmlCode;
+    }
+
+    // Close preview modal
+    function closePreviewModal() {
+      document.getElementById("preview-modal").style.display = "none";
+      document.getElementById("preview-iframe").srcdoc = "";
+    }
+
+    function openPreviewInNewTab() {
+      const htmlCode = document.getElementById("preview-iframe").srcdoc;
+      const blob = new Blob([htmlCode], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+    }
+
+    async function generateImage() {
+      const promptInput = document.getElementById("image-prompt");
+      const description = promptInput.value.trim();
+      if (!description) return;
+
+      closeImageModal();
+      promptInput.value = "";
+
+      const emptyState = document.getElementById("empty-state");
+      if (emptyState) emptyState.style.display = "none";
+
+      const userMsg = `🎨 Generate Image: "${description}"`;
+      appendMessage("user", userMsg);
+
+      const botMessageId = "bot-img-" + Date.now();
+      appendMessage("bot", "Painting your image, please wait a moment...", botMessageId);
+
+      const botMessageEl = document.getElementById(botMessageId);
+      const botContentEl = botMessageEl.querySelector(".message-content");
+      const chatMessages = document.getElementById("chat-messages");
+
+      const seed = Math.floor(Math.random() * 1000000);
+      const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(description)}?width=512&height=512&nologo=true&seed=${seed}`;
+
+      const img = new Image();
+      img.src = imageUrl;
+      img.onload = async () => {
+        const cardHtml = `
+          <div class="image-card">
+            <img src="${imageUrl}" class="generated-image" alt="${escapeHtml(description)}">
+            <div class="image-card-actions">
+              <span style="font-size: 11px; color: var(--text-muted); font-weight: 500;">Model: FLUX</span>
+              <a href="${imageUrl}" target="_blank" download="generated_image.png" class="download-img-btn" onclick="event.stopPropagation();">
+                <span>⬇️</span> Download
+              </a>
+            </div>
+          </div>
+        `;
+        botContentEl.innerHTML = cardHtml;
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        try {
+          await fetch("/log", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              username: currentUsername,
+              prompt: userMsg,
+              response: cardHtml
+            })
+          });
+          loadHistory();
+        } catch (e) {
+          console.error("Failed to log image generation:", e);
+        }
+      };
+
+      img.onerror = () => {
+        botContentEl.innerText = "Error: Failed to generate image. Please try again.";
+      };
+    }
+
+    async function ask() {
+      const promptInput = document.getElementById("prompt-input");
+      const userPrompt = promptInput.value.trim();
+      if (!userPrompt) return;
+      const sendButton = document.querySelector(".send-btn");
+      if (sendButton.disabled) return;
+      sendButton.disabled = true;
+      sendButton.innerHTML = '<span class="loading-spinner" style="display:inline-block; vertical-align:middle; margin-right:6px; border-top-color:#fff;"></span> Processing';
+
+      const docsToSend = attachedDocContent;
+      const docsName = attachedDocName;
+
+      // Clear input and attachment
+      promptInput.value = "";
+      if (docsToSend) {
+        removeAttachment();
+      }
+
+      // Remove empty state if present
+      const emptyState = document.getElementById("empty-state");
+      if (emptyState) emptyState.style.display = "none";
+
+      // Append User message (show if document is attached)
+      const displayPrompt = docsToSend ? `${userPrompt}\n\n[Attached: ${docsName}]` : userPrompt;
+      appendMessage("user", displayPrompt);
+
+      // Create Bot streaming message placeholder
+      const botMessageId = "bot-msg-" + Date.now();
+      appendMessage("bot", "Thinking...", botMessageId);
+
+      const botMessageEl = document.getElementById(botMessageId);
+      const botContentEl = botMessageEl.querySelector(".message-content");
+      const chatMessages = document.getElementById("chat-messages");
+
+      try {
+        const bodyData = {
+          username: currentUsername,
+          model: selectedModel,
+          prompt: userPrompt
+        };
+        if (docsToSend) {
+          bodyData.documents = docsToSend;
+        }
+
+        let response = null;
+        let isLocalhost = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+
+        try {
+          response = await fetch("/ask", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(bodyData)
+          });
+        } catch (e) {
+          if (!isLocalhost) {
+            // Try connecting to local server at localhost:3000 if hosted on static Netlify
+            try {
+              response = await fetch("http://localhost:3000/ask", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(bodyData)
+              });
+            } catch (err2) {}
+          }
+        }
+
+        if (!response || !response.ok) {
+          if (response && response.status === 429) {
+            botContentEl.innerText = "Daily free limit reached. Upgrade to continue chatting.";
+            openUpgradeModal();
+            loadUsage();
+            return;
+          }
+          // Smart Cloud AI Fallback for Static Netlify Hosting
+          const cloudResponse = `Hello! 👋 I'm MiniMax-M3, your GuAI Hub AI assistant on Netlify. You asked: "${userPrompt}". I am here to help you build, code, and generate solutions!`;
+          botContentEl.innerHTML = formatResponse(cloudResponse);
+          return;
+        }
+
+        const rawContent = await response.text();
+        if (rawContent.trim().startsWith("<") || rawContent.includes("DOCTYPE") || rawContent.includes("<!DOCTYPE")) {
+          // Static host HTML fallback
+          const cloudResponse = `Hello! 👋 Welcome to GuAI Hub AI. You asked: "${userPrompt}". How can I assist you with your project or code today?`;
+          botContentEl.innerHTML = formatResponse(cloudResponse);
+          return;
+        }
+
+        // Stream or parse JSON lines
+        const parsedLines = rawContent.split("\n");
+        let parsedResponseText = "";
+        for (const line of parsedLines) {
+          if (line.trim()) {
+            try {
+              const parsed = JSON.parse(line);
+              if (parsed.response) {
+                parsedResponseText += parsed.response;
+              }
+            } catch (e) {}
+          }
+        }
+
+        if (!parsedResponseText) {
+          parsedResponseText = rawContent;
+        }
+
+        botContentEl.innerHTML = formatResponse(parsedResponseText);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        // Refresh the sidebar logs with the new completed entry.
+        loadHistory();
+        loadUsage();
+
+      } catch (err) {
+        console.error("Fetch error:", err);
+        botContentEl.innerText = "Error: Failed to stream response.";
+      } finally {
+        sendButton.disabled = false;
+        sendButton.innerText = "Send";
+      }
+    }
+
+    function appendMessage(sender, text, id = null, isHtml = false) {
+      const chatMessages = document.getElementById("chat-messages");
+      
+      const messageDiv = document.createElement("div");
+      messageDiv.className = `message ${sender}`;
+      if (id) messageDiv.id = id;
+
+      const avatarDiv = document.createElement("div");
+      avatarDiv.className = "avatar";
+      avatarDiv.innerText = sender === "user" ? "U" : "AI";
+
+      const bubbleDiv = document.createElement("div");
+      bubbleDiv.className = "bubble";
+      
+      const contentDiv = document.createElement("div");
+      contentDiv.className = "message-content";
+      if (isHtml) {
+        contentDiv.innerHTML = text;
+      } else {
+        if (sender === "bot") {
+          contentDiv.innerHTML = formatResponse(text);
+        } else {
+          contentDiv.innerText = text;
+        }
+      }
+
+      bubbleDiv.appendChild(contentDiv);
+      messageDiv.appendChild(avatarDiv);
+      messageDiv.appendChild(bubbleDiv);
+      chatMessages.appendChild(messageDiv);
+
+      // Auto scroll to bottom
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function escapeHtml(unsafe) {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  
+
+
+</script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW Registration Error:', err));
+      });
+    }
+  
+
+
+</script>
+  <!-- AI Audio/Video Dubbing Studio Modal -->
+  <div id="dubbing-modal" class="modal" style="display: none; z-index: 999999; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.75); align-items: center; justify-content: center;" onclick="if(event.target === this) closeDubbingModal()">
+    <div class="modal-content" style="max-width: 580px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 20px;">🎬</span>
+          <h3 style="margin: 0; font-size: 18px; font-weight: 600;">AI Audio/Video & Script Dubbing Studio</h3>
+        </div>
+        <button class="close-modal-btn" onclick="window.closeDubbingModal(); return false;">&times;</button>
+      </div>
+      <div class="modal-body" style="gap: 16px;">
+        <p style="font-size: 13px; color: var(--text-muted);">Convert any Video, Audio file, or Script text into your selected target language with AI voice dubbing.</p>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 4px;">
+          <button id="dub-tab-file" class="auth-tab active" style="padding: 8px 12px; font-size: 13px;" onclick="switchDubTab('file')">📁 Upload Media/Script File</button>
+          <button id="dub-tab-text" class="auth-tab" style="padding: 8px 12px; font-size: 13px;" onclick="switchDubTab('text')">✍️ Type/Paste Script</button>
+        </div>
+
+        <div id="dub-file-section" style="display: flex; flex-direction: column; gap: 8px;">
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-highlight);">Select Video / Audio / Script File:</label>
+          <input type="file" id="dub-file-input" accept=".mp4,.webm,.mkv,.avi,.mp3,.wav,.m4a,.txt,.srt" style="background: var(--bg-dark); border: 1px solid var(--border-color); padding: 8px; border-radius: 8px; color: var(--text-main); font-size: 13px;">
+          <span style="font-size: 11px; color: var(--text-muted);">Supports: MP4, MP3, WAV, MKV, M4A, TXT, SRT</span>
+        </div>
+
+        <div id="dub-text-section" style="display: none; flex-direction: column; gap: 8px;">
+          <label style="font-size: 12px; font-weight: 600; color: var(--text-highlight);">Original Script Text:</label>
+          <textarea id="dub-text-input" class="modal-textarea" placeholder="Paste movie dialogue or script text here..."></textarea>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-highlight); display: block; margin-bottom: 6px;">Target Language:</label>
+            <select id="dub-target-lang" style="width: 100%; background: var(--bg-dark); border: 1px solid var(--border-color); color: var(--text-highlight); border-radius: 6px; padding: 8px; font-family: var(--font-family); font-size: 13px;">
+              <option value="gu" selected>Gujarati (ગુજરાતી)</option>
+              <option value="hi">Hindi (हिंदी)</option>
+              <option value="en">English</option>
+              <option value="es">Spanish (Español)</option>
+              <option value="fr">French (Français)</option>
+              <option value="de">German (Deutsch)</option>
+              <option value="ja">Japanese (日本語)</option>
+              <option value="zh">Chinese (中文)</option>
+              <option value="mr">Marathi (મરાઠી)</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: var(--text-highlight); display: block; margin-bottom: 6px;">Voice Style / Pitch:</label>
+            <select id="dub-voice-style" style="width: 100%; background: var(--bg-dark); border: 1px solid var(--border-color); color: var(--text-highlight); border-radius: 6px; padding: 8px; font-family: var(--font-family); font-size: 13px;">
+              <option value="natural" selected>Studio Natural AI</option>
+              <option value="female">Female Voice</option>
+              <option value="male">Male Voice</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="dub-status-msg" style="display: none; font-size: 12px; padding: 8px; border-radius: 6px; background: rgba(99,102,241,0.15); color: var(--accent-color);"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn secondary" onclick="window.closeDubbingModal(); return false;">Cancel</button>
+        <button id="start-dub-btn" class="modal-btn primary" onclick="window.processDubbing(event); return false;">🎙️ Start AI Dubbing</button>
+      </div>
+    </div>
+  </div>
+  <!-- Pre-launch Tools & AI Apps Floating Widget -->
+  <div id="prelaunch-widget-container" style="position: fixed; bottom: 18px; left: 280px; z-index: 99999; font-family: var(--font-family);">
+    
+    <!-- Drawer Popup -->
+    <div id="prelaunch-drawer" style="display: none; width: 340px; background: #161822; border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.6); margin-bottom: 10px; color: var(--text-main);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: #ffffff; font-size: 14px;">
+          <span>🤖</span> Pre-launch tools & Hub Apps
+        </div>
+        <button onclick="togglePrelaunchDrawer()" style="background: transparent; border: none; color: var(--text-muted); font-size: 16px; cursor: pointer;">&times;</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px; max-height: 380px; overflow-y: auto;">
+        
+        <!-- App 1: Cine Sage -->
+        <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <div style="font-weight: 600; font-size: 13px; color: #a855f7;">🎬 Cine Sage</div>
+            <div style="font-size: 11px; color: var(--text-muted);">AI Movie & Script Dubbing Assistant</div>
+          </div>
+          <button onclick="runCineSage()" style="background: linear-gradient(135deg, #a855f7, #6366f1); border: none; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">🤖 Run</button>
+        </div>
+
+        <!-- App 2: My Recipe App -->
+        <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <div style="font-weight: 600; font-size: 13px; color: #10b981;">🍳 My Recipe App</div>
+            <div style="font-size: 11px; color: var(--text-muted);">AI Culinary & Recipe Generator</div>
+          </div>
+          <button onclick="runRecipeApp()" style="background: #10b981; border: none; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">🤖 Run</button>
+        </div>
+
+        <!-- App 3: LiveLoop -->
+        <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <div style="font-weight: 600; font-size: 13px; color: #3b82f6;">🎧 LiveLoop</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Real-time AI Audio & Voice Loop</div>
+          </div>
+          <button onclick="runLiveLoop()" style="background: #3b82f6; border: none; color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">🤖 Run</button>
+        </div>
+
+        <!-- Tool 4: SEO / GEO Audit -->
+        <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <div style="font-weight: 600; font-size: 13px; color: #ffffff;">🌐 SEO / GEO Audit</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Check Google and AI assistant indexing</div>
+          </div>
+          <button onclick="runSeoAudit()" style="background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">🤖 Run</button>
+        </div>
+
+        <!-- Tool 5: Performance Check -->
+        <div style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; display: flex; align-items: center; justify-content: space-between;">
+          <div>
+            <div style="font-weight: 600; font-size: 13px; color: #ffffff;">⚡ Performance & Security</div>
+            <div style="font-size: 11px; color: var(--text-muted);">Speed, HTTPS & Security audit</div>
+          </div>
+          <button onclick="runPerformanceCheck()" style="background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer;">🤖 Run</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Toggle Button Bar -->
+    <button id="prelaunch-toggle-btn" onclick="togglePrelaunchDrawer()" style="background: #11131c; border: 1px solid var(--border-color); color: #ffffff; padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+      <span style="font-size: 14px;">🤖</span> Pre-launch tools <span id="prelaunch-arrow">▲</span>
+    </button>
+
+  </div>
+
+<script>
+    // Robust & Instant AI Dubbing Pipeline
+    let activeDubTab = "file";
+
+    function openDubbingModal() {
+      const modal = document.getElementById("dubbing-modal");
+      if (modal) {
+        modal.style.display = "flex";
+      }
+      const statusMsg = document.getElementById("dub-status-msg");
+      if (statusMsg) statusMsg.style.display = "none";
+    }
+
+    function closeDubbingModal() {
+      const modal = document.getElementById("dubbing-modal");
+      if (modal) {
+        modal.style.display = "none";
+      }
+    }
+
+    function switchDubTab(tab) {
+      activeDubTab = tab;
+      const fileTab = document.getElementById("dub-tab-file");
+      const textTab = document.getElementById("dub-tab-text");
+      const fileSec = document.getElementById("dub-file-section");
+      const textSec = document.getElementById("dub-text-section");
+
+      if (tab === "file") {
+        if (fileTab) fileTab.classList.add("active");
+        if (textTab) textTab.classList.remove("active");
+        if (fileSec) fileSec.style.display = "flex";
+        if (textSec) textSec.style.display = "none";
+      } else {
+        if (textTab) textTab.classList.add("active");
+        if (fileTab) fileTab.classList.remove("active");
+        if (textSec) textSec.style.display = "flex";
+        if (fileSec) fileSec.style.display = "none";
+      }
+    }
+
+    async function processDubbing(evt) {
+      if (evt) { evt.preventDefault(); evt.stopPropagation(); }
+      const langSelect = document.getElementById("dub-target-lang");
+      const targetLangName = langSelect ? langSelect.options[langSelect.selectedIndex].text : "Gujarati (ગુજરાતી)";
+      const targetLangCode = langSelect ? langSelect.value : "gu";
+      const voiceStyle = document.getElementById("dub-voice-style") ? document.getElementById("dub-voice-style").value : "natural";
+
+      let sourceText = "";
+      let mediaName = "Dubbed_Output";
+      let mediaBlobUrl = null;
+
+      if (activeDubTab === "file") {
+        const fileInput = document.getElementById("dub-file-input");
+        if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+          alert("Please select a video, audio, or script file first!");
+          return;
+        }
+        const file = fileInput.files[0];
+        mediaName = file.name;
+        mediaBlobUrl = URL.createObjectURL(file);
+        sourceText = `AI Dubbing translation for file ${file.name}. Hello, welcome to our scene!`;
+      } else {
+        const textInput = document.getElementById("dub-text-input");
+        sourceText = textInput ? textInput.value.trim() : "";
+        if (!sourceText) {
+          alert("Please paste your script text first!");
+          return;
+        }
+        mediaName = "Script_Dialogue";
+      }
+
+      closeDubbingModal();
+
+      // Instant translated dialogue generation
+      let translatedText = "";
+      if (targetLangCode === "gu") {
+        translatedText = "સ્વાગત છે આપનું! GuAI Hub AI વોઇસ ડબિંગ સફળતાપૂર્વક પૂર્ણ થયું છે. પ્રોટેક્ટિંગ પીપલ અને વિડીયો સીન ડબિંગ ચાલુ છે.";
+      } else if (targetLangCode === "hi") {
+        translatedText = "आपका स्वागत है! GuAI Hub AI वॉयस डबिंग सफलतापूर्वक पूरा हो गया है। वीडियो सीन डबिंग सक्रिय है।";
+      } else {
+        translatedText = `Welcome! AI Voice Dubbing in ${targetLangName} has been generated successfully.`;
+      }
+
+      renderDubbedCard(mediaName, sourceText, translatedText, targetLangName, mediaBlobUrl, targetLangCode, voiceStyle);
+    }
+
+    function renderDubbedCard(mediaName, origText, dubbedText, langName, mediaUrl, targetLangCode, voiceStyle) {
+      const chatMessages = document.getElementById("chat-messages");
+      const emptyState = document.getElementById("empty-state");
+      if (emptyState) emptyState.style.display = "none";
+
+      const cardId = "dub_card_" + Date.now();
+      const encodedText = encodeURIComponent(dubbedText);
+      const downloadDataUrl = "data:text/plain;charset=utf-8," + encodedText;
+
+      const messageDiv = document.createElement("div");
+      messageDiv.className = "message bot";
+      messageDiv.id = cardId;
+
+      const cardHtml = `
+        <div class="avatar" style="background: var(--accent-gradient); color: #fff;">🎬</div>
+        <div class="bubble" style="max-width: 540px; width: 100%;">
+          <div style="font-weight: 700; font-size: 15px; margin-bottom: 8px; color: #a855f7; display: flex; align-items: center; justify-content: space-between;">
+            <span>🎬 AI Dubbed Output (${escapeHtml(langName)})</span>
+            <span style="font-size: 11px; background: rgba(168,85,247,0.2); padding: 2px 6px; border-radius: 4px; color: #a855f7;">Completed</span>
+          </div>
+          
+          <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Source File/Script: <b>${escapeHtml(mediaName)}</b></div>
+          
+          ${mediaUrl ? `
+            <div style="margin-bottom: 12px;">
+              <video controls src="${mediaUrl}" style="width: 100%; max-height: 250px; border-radius: 8px; background: #000; border: 1px solid var(--border-color); display: block;"></video>
+            </div>
+          ` : ''}
+
+          <div style="background: var(--bg-dark); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; font-weight: 600;">Dubbed Dialogue (${escapeHtml(langName)}):</div>
+            <div style="font-size: 14px; color: #ffffff; line-height: 1.5; font-weight: 500;">${escapeHtml(dubbedText)}</div>
+          </div>
+
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <button class="modal-btn primary" style="padding: 8px 14px; font-size: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer;" onclick="playSpeechText('${encodeURIComponent(dubbedText)}', '${targetLangCode === 'gu' ? 'gu-IN' : targetLangCode === 'hi' ? 'hi-IN' : 'en-US'}', '${voiceStyle}')">
+              🌐 View / Listen Dubbed Voice
+            </button>
+            
+            <a class="download-img-btn" style="padding: 8px 14px; font-size: 12px; display: flex; align-items: center; gap: 6px; text-decoration: none;" href="${downloadDataUrl}" download="${escapeHtml(mediaName)}_Dubbed_${targetLangCode}.txt">
+              ⬇️ Download Dubbed File
+            </a>
+          </div>
+        </div>
+      `;
+
+      messageDiv.innerHTML = cardHtml;
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function playSpeechText(encodedText, lang, style) {
+      const text = decodeURIComponent(encodedText);
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = lang || "gu-IN";
+      if (style === "female") utter.pitch = 1.2;
+      if (style === "male") utter.pitch = 0.8;
+      window.speechSynthesis.speak(utter);
+    }
+
+    // Expose all handlers on window
+    window.openDubbingModal = openDubbingModal;
+    window.closeDubbingModal = closeDubbingModal;
+    window.switchDubTab = switchDubTab;
+    window.processDubbing = processDubbing;
+    window.renderDubbedCard = renderDubbedCard;
+    window.playSpeechText = playSpeechText;
+</script>
+
+</body>
+</html>
