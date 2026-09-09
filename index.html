@@ -13,6 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://www.paypal.com/sdk/js?client-id=sb&currency=USD"></script>
   <style>
     :root {
       --bg-dark: #0f1015;
@@ -1010,6 +1011,37 @@
       color: #ef4444;
       background-color: rgba(239, 68, 68, 0.1);
     }
+
+    .settings-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); width: 34px; height: 34px; border-radius: 8px; cursor: pointer; font-size: 18px; }
+    .settings-btn:hover { border-color: var(--accent-color); color: var(--text-highlight); background-color: var(--card-hover); }
+    .settings-screen { position: fixed; inset: 0; z-index: 2500; overflow-y: auto; background: #f7f7f8; color: #17181c; font-family: Arial, sans-serif; }
+    .settings-shell { width: min(900px, calc(100% - 48px)); margin: 72px auto; }
+    .settings-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 42px; }
+    .settings-brand { display: flex; align-items: center; gap: 12px; font-size: 21px; font-weight: 700; }
+    .settings-brand img { width: 36px; height: 36px; object-fit: contain; }
+    .settings-close { border: 0; background: transparent; color: #555861; font-size: 28px; cursor: pointer; line-height: 1; }
+    .settings-account { margin-bottom: 38px; }
+    .settings-account strong { display: block; font-size: 15px; margin-bottom: 8px; }
+    .settings-account span { color: #667085; font-size: 13px; }
+    .settings-actions { display: flex; gap: 9px; margin-top: 14px; }
+    .settings-actions button { border: 1px solid #d2d4d8; background: #fff; border-radius: 7px; padding: 9px 13px; font-weight: 600; cursor: pointer; }
+    .settings-actions .settings-upgrade { background: #1d2b27; color: #fff; border-color: #1d2b27; }
+    .settings-list { border-top: 1px solid #e2e3e6; }
+    .settings-row { min-height: 68px; padding: 14px 0; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #e2e3e6; }
+    .settings-row-icon { width: 24px; text-align: center; font-size: 19px; color: #111; }
+    .settings-row-copy { flex: 1; min-width: 0; }
+    .settings-row-copy strong { display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+    .settings-row-copy small { color: #667085; font-size: 13px; }
+    .settings-control { flex: 0 0 auto; }
+    .settings-toggle { width: 32px; height: 20px; appearance: none; border: 0; border-radius: 20px; background: #c4c6ca; position: relative; cursor: pointer; }
+    .settings-toggle::after { content: ""; position: absolute; width: 16px; height: 16px; top: 2px; left: 2px; border-radius: 50%; background: #fff; transition: transform 0.2s; }
+    .settings-toggle:checked { background: #202124; }
+    .settings-toggle:checked::after { transform: translateX(12px); }
+    .settings-input { width: 735px; max-width: 100%; border: 1px solid #d5d7da; border-radius: 8px; padding: 10px 12px; color: #172033; background: #fff; font-size: 13px; }
+    .settings-browse { border: 1px solid #d5d7da; background: #fff; border-radius: 8px; padding: 9px 13px; font-weight: 600; cursor: pointer; }
+    .settings-range { width: 100%; accent-color: #202124; }
+    .settings-scale { display: flex; justify-content: space-between; color: #adb0b6; font-size: 11px; margin-top: 8px; }
+    @media (max-width: 640px) { .settings-shell { width: calc(100% - 32px); margin: 28px auto; } .settings-topbar { margin-bottom: 28px; } .settings-row { align-items: flex-start; } .settings-row-copy small { line-height: 1.4; display: block; } }
   </style>
   <!-- Google AdSense Auto Ads -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2523359993935749"
@@ -1019,7 +1051,6 @@
 </script>
 </head>
 <body>
-
   <!-- Auth Container (Login / Signup Screen) -->
   <div id="auth-container" class="auth-container" style="display: none;">
     <div class="auth-card">
@@ -1049,6 +1080,20 @@
       </div>
     </div>
   </div>
+
+  <section id="settings-screen" class="settings-screen" style="display: none;" aria-label="GuAI Hub Settings">
+    <div class="settings-shell">
+      <div class="settings-topbar"><div class="settings-brand"><img src="assets/guai_hub_icon.png" alt=""> <span>GuAI Hub Settings</span></div><button class="settings-close" onclick="closeSettings()" aria-label="Close settings">&times;</button></div>
+      <div class="settings-account"><strong id="settings-account-name">Username</strong><span id="settings-account-email">Local GuAI Hub account</span><div class="settings-actions"><button class="settings-upgrade" onclick="openUpgradeModal(); closeSettings();">Upgrade</button><button onclick="closeSettings()">Done</button><button onclick="logout(); closeSettings();">Sign out</button></div></div>
+      <div class="settings-list">
+        <label class="settings-row"><span class="settings-row-icon">☁</span><span class="settings-row-copy"><strong>Cloud</strong><small>Enable cloud models and web search.</small></span><input class="settings-toggle settings-control" type="checkbox" data-setting="cloud" checked></label>
+        <label class="settings-row"><span class="settings-row-icon">⇩</span><span class="settings-row-copy"><strong>Auto-download updates</strong><small>Automatically download updates when available.</small></span><input class="settings-toggle settings-control" type="checkbox" data-setting="autoDownload" checked></label>
+        <label class="settings-row"><span class="settings-row-icon">⌁</span><span class="settings-row-copy"><strong>Expose Ollama to the network</strong><small>Allow other devices or services to access Ollama.</small></span><input class="settings-toggle settings-control" type="checkbox" data-setting="network" checked></label>
+        <div class="settings-row"><span class="settings-row-icon">▰</span><span class="settings-row-copy"><strong>Model location</strong><small>Location where models are stored.</small><div style="display:flex;gap:8px;align-items:center;margin-top:12px;"><input id="settings-model-location" class="settings-input" value="C:\\Users\\patel\\AppData\\Local\\Programs\\Ollama"><button class="settings-browse" onclick="document.getElementById('settings-model-location').focus()">Browse</button></div></span></div>
+        <div class="settings-row"><span class="settings-row-icon">⚙</span><span class="settings-row-copy"><strong>Context length</strong><small>Context length determines how much your conversation local LLMs can remember and use to generate responses.</small><input id="settings-context-length" class="settings-range" type="range" min="4096" max="262144" step="4096" value="32768" oninput="document.getElementById('context-value').textContent = this.value / 1024 + 'k'"><span class="settings-scale"><span>4k</span><span>8k</span><span>16k</span><span id="context-value">32k</span><span>64k</span><span>128k</span><span>256k</span></span></span></div>
+      </div>
+    </div>
+  </section>
 
   <!-- Left Sidebar (History Panel) -->
   <aside class="sidebar">
@@ -1081,7 +1126,7 @@
         <div class="user-avatar" id="user-avatar-initial">U</div>
         <span class="user-name" id="user-display-name">Username</span>
       </div>
-      <button class="logout-btn" onclick="logout()">Logout</button>
+      <div style="display:flex;gap:8px;align-items:center;"><button class="settings-btn" onclick="openSettings()" title="GuAI Hub Settings" aria-label="GuAI Hub Settings">⚙</button><button class="logout-btn" onclick="logout()">Logout</button></div>
     </div>
   </aside>
 
@@ -1236,6 +1281,7 @@
             <span>Shared workspace<br>Team controls</span>
           </div>
         </div>
+        <div id="paypal-button-container"></div>
         <p style="font-size: 12px; color: var(--text-muted);">Online billing is not connected yet. Add a payment provider before enabling paid upgrades.</p>
       </div>
       <div class="modal-footer">
@@ -1245,6 +1291,21 @@
   </div>
 
   <script>
+    paypal.Buttons({
+      createOrder: function(data, actions) {
+        return actions.order.create({
+          purchase_units: [{
+            amount: { value: '9.99' }
+          }]
+        });
+      },
+      onApprove: function(data, actions) {
+        return actions.order.capture().then(function(details) {
+          alert('Transaction completed by ' + details.payer.name.given_name);
+        });
+      }
+    }).render('#paypal-button-container');
+
     let chatHistory = [];
     let currentUsername = "";
     let authMode = "login";
@@ -1580,6 +1641,43 @@
     function closeUpgradeModal() {
       document.getElementById("upgrade-modal").style.display = "none";
     }
+
+    function openSettings() {
+      const screen = document.getElementById("settings-screen");
+      if (!screen) return;
+      document.getElementById("settings-account-name").innerText = currentUsername || "Username";
+      document.querySelectorAll("[data-setting]").forEach(input => {
+        const saved = localStorage.getItem(`setting-${input.dataset.setting}`);
+        input.checked = saved === null ? true : saved === "true";
+      });
+      const location = localStorage.getItem("setting-model-location");
+      if (location) document.getElementById("settings-model-location").value = location;
+      const context = localStorage.getItem("setting-context-length");
+      if (context) {
+        const slider = document.getElementById("settings-context-length");
+        slider.value = context;
+        document.getElementById("context-value").innerText = `${Number(context) / 1024}k`;
+      }
+      screen.style.display = "block";
+    }
+
+    function closeSettings() {
+      const screen = document.getElementById("settings-screen");
+      if (screen) screen.style.display = "none";
+    }
+
+    document.addEventListener("change", event => {
+      const input = event.target;
+      if (input.matches("[data-setting]")) {
+        localStorage.setItem(`setting-${input.dataset.setting}`, input.checked);
+      }
+      if (input.id === "settings-model-location") {
+        localStorage.setItem("setting-model-location", input.value);
+      }
+      if (input.id === "settings-context-length") {
+        localStorage.setItem("setting-context-length", input.value);
+      }
+    });
 
     async function loadUsage() {
       const badge = document.getElementById("usage-badge");
