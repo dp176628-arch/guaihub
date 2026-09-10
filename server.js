@@ -10,6 +10,12 @@ const HOST = process.env.HOST || "0.0.0.0";
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || "http://127.0.0.1:11434";
 const DAILY_FREE_LIMIT = 10;
 const anonymousUsage = {};
+const PAYPAL_MODE = process.env.PAYPAL_MODE === "live" ? "live" : "sandbox";
+const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || "";
+const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET || "";
+const PAYPAL_API_BASE = PAYPAL_MODE === "live"
+  ? "https://api-m.paypal.com"
+  : "https://api-m.sandbox.paypal.com";
 
 console.log("Ollama Base URL:", OLLAMA_BASE_URL);
 
@@ -19,6 +25,76 @@ app.use(express.static(__dirname));
 
 app.get("/health", (req, res) => {
   res.json({ status: "ok", service: "guai-hub" });
+});
+
+app.get("/api/paypal/config", (req, res) => {
+  res.json({
+    enabled: Boolean(PAYPAL_CLIENT_ID && PAYPAL_CLIENT_SECRET),
+    clientId: PAYPAL_CLIENT_ID,
+    mode: PAYPAL_MODE
+  });
+});
+
+async function getPayPalAccessToken() {
+  if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
+    throw new Error("PayPal credentials are not configured");
+  }
+  const credentials = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString("base64");
+  const response = await fetch(`${PAYPAL_API_BASE}/v1/oauth2/token`, {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${credentials}`,
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: "grant_type=client_credentials"
+  });
+  if (!response.ok) throw new Error(`PayPal authentication failed (${response.status})`);
+  return (await response.json()).access_token;
+}
+
+app.post("/api/paypal/orders", async (req, res) => {
+  try {
+    const { plan } = req.body || {};
+    const prices = { pro: "9.99", team: "24.99" };
+    if (!prices[plan]) return res.status(400).json({ error: "Invalid plan" });
+    const token = await getPayPalAccessToken();
+    const response = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        intent: "CAPTURE",
+        purchase_units: [{
+          description: `GuAI Hub ${plan === "pro" ? "Pro" : "Team"} monthly plan`,
+          amount: { currency_code: "USD", value: prices[plan] }
+        }]
+      })
+    });
+    const body = await response.json();
+    if (!response.ok) return res.status(response.status).json({ error: body.message || "PayPal order creation failed" });
+    res.json({ id: body.id });
+  } catch (err) {
+    console.error("PayPal order error:", err.message);
+    res.status(503).json({ error: "PayPal is not configured or unavailable" });
+  }
+});
+
+app.post("/api/paypal/orders/:orderId/capture", async (req, res) => {
+  try {
+    const token = await getPayPalAccessToken();
+    const response = await fetch(`${PAYPAL_API_BASE}/v2/checkout/orders/${encodeURIComponent(req.params.orderId)}/capture`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }
+    });
+    const body = await response.json();
+    if (!response.ok) return res.status(response.status).json({ error: body.message || "PayPal capture failed" });
+    res.json({ status: body.status, orderId: body.id });
+  } catch (err) {
+    console.error("PayPal capture error:", err.message);
+    res.status(503).json({ error: "PayPal is not configured or unavailable" });
+  }
 });
 
 let users = {};
