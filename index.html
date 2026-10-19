@@ -1,6 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lan
+  g="en">
 <head>
+  <!-- manifest.json લિંક કરો -->
+    <link rel="manifest" href="/manifest.json">
+
+    <script>
+      // Service Worker (sw.js) રજિસ્ટર કરો
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js');
+        });
+      }
+    </script>
   <!-- Google AdSense Auto Ads & Script -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2523359993935749"
        crossorigin="anonymous"></script>
