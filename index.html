@@ -1,30 +1,27 @@
 <!DOCTYPE html>
-<html lan
-  g="en">
+<html lang="en">
 <head>
-<!-- manifest.json લિંક કરો -->
-    <link rel="manifest" href="/manifest.json">
+  <!-- manifest.json લિંક કરો -->
+  <link rel="manifest" href="/manifest.json">
 
-    <script>
-      // Service Worker (sw.js) રજિસ્ટર કરો
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js');
-        });
-      }
-    </script>
-  <!-- Google AdSense Auto Ads & Script -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2523359993935749"
-       crossorigin="anonymous"></script>
+  <script>
+    // Service Worker (sw.js) રજિસ્ટર કરો
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js');
+      });
+    }
+  </script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GuAI Hub v1.2</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0f1015">
-  <link rel="icon" type="image/png" href="assets/guai_hub_icon.png">
+  <!-- Uptodown Developer Domain Verification -->
+  <meta name="uptodown-verification" content="guai-hub-uptodown-verify" />
+  <title>Ask My Local AI</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
   <style>
     :root {
       --bg-dark: #0f1015;
@@ -55,7 +52,17 @@
       color: var(--text-main);
       display: flex;
       height: 100vh;
-      overflow: hidden;
+      overflow-y: auto;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      max-height: calc(100vh - 140px);
     }
 
     /* Sidebar Styles */
@@ -72,16 +79,6 @@
     .sidebar-header {
       padding: 24px;
       border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .sidebar-header-content {
-      display: flex;
-      align-items: center;
-      gap: 16px;
     }
 
     .brand {
@@ -90,42 +87,10 @@
       background: var(--accent-gradient);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      margin-bottom: 16px;
       display: flex;
       align-items: center;
       gap: 10px;
-    }
-
-    .auth-nav {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .auth-link {
-      color: #a78bfa;
-      text-decoration: none;
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    .auth-link:hover {
-      color: var(--accent-color);
-    }
-
-    .upgrade-link {
-      color: var(--text-highlight);
-      background: var(--accent-gradient);
-      border-radius: 6px;
-      padding: 6px 10px;
-      text-decoration: none;
-      font-size: 12px;
-      font-weight: 600;
-      transition: opacity 0.2s, transform 0.2s;
-    }
-
-    .upgrade-link:hover {
-      opacity: 0.9;
-      transform: translateY(-1px);
     }
 
     .new-chat-btn {
@@ -147,8 +112,51 @@
     }
 
     .new-chat-btn:hover {
-      transform: translateY(-1s);
+      transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+
+    .upgrade-btn {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: transparent;
+      border: 1px solid #f59e0b;
+      border-radius: 8px;
+      color: #fbbf24;
+      font-family: var(--font-family);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s;
+    }
+
+    .upgrade-btn:hover {
+      background-color: rgba(245, 158, 11, 0.14);
+      color: #fcd34d;
+    }
+
+    .sidebar-uptodown-btn {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid var(--accent-color);
+      border-radius: 8px;
+      color: var(--text-highlight);
+      font-family: var(--font-family);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background-color 0.2s;
+    }
+
+    .sidebar-uptodown-btn:hover {
+      background-color: rgba(99, 102, 241, 0.2);
     }
 
     .search-container {
@@ -260,17 +268,6 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
-    }
-
-    .chat-messages {
-      flex: 1;
-      min-height: 0;
-      overflow-y: auto;
-      padding: 32px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      scrollbar-gutter: stable;
     }
 
     .chat-empty-state {
@@ -418,49 +415,6 @@
       transform: scale(0.95);
     }
 
-    .file-upload-btn {
-      background: transparent;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      color: var(--text-main);
-      padding: 10px 12px;
-      cursor: pointer;
-      font-size: 16px;
-      transition: border-color 0.2s;
-    }
-
-    .file-upload-btn:hover {
-      border-color: var(--accent-color);
-      color: var(--accent-color);
-    }
-
-    #doc-input {
-      display: none;
-    }
-
-    .doc-badge {
-      font-size: 11px;
-      background-color: var(--accent-color);
-      color: var(--text-highlight);
-      padding: 4px 8px;
-      border-radius: 4px;
-      margin-left: 8px;
-    }
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #59627f;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--text-muted);
-    }
-
-    /* Icon Buttons inside Input Bar */
     .icon-btn {
       background: transparent;
       border: none;
@@ -480,11 +434,6 @@
       transform: scale(1.05);
     }
 
-    .icon-btn:active {
-      transform: scale(0.95);
-    }
-
-    /* Attachment Preview */
     .attachment-preview {
       display: flex;
       align-items: center;
@@ -494,44 +443,12 @@
       border-radius: 8px;
       padding: 10px 14px;
       margin-bottom: 12px;
-      animation: slideInUp 0.2s ease-out;
-    }
-
-    @keyframes slideInUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     .attachment-info {
       display: flex;
       align-items: center;
       gap: 8px;
-    }
-
-    .attachment-processing {
-      display: none;
-      align-items: center;
-      gap: 6px;
-      color: var(--accent-color);
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .attachment-processing.active {
-      display: flex;
-    }
-
-    .loading-spinner {
-      width: 14px;
-      height: 14px;
-      border: 2px solid rgba(99, 102, 241, 0.25);
-      border-top-color: var(--accent-color);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
     }
 
     .attachment-icon {
@@ -544,25 +461,20 @@
       font-weight: 500;
     }
 
+    .attachment-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
     .remove-attachment-btn {
       background: transparent;
       border: none;
       color: var(--text-muted);
       font-size: 18px;
       cursor: pointer;
-      line-height: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       width: 20px;
       height: 20px;
       border-radius: 50%;
-      transition: background-color 0.2s, color 0.2s;
-    }
-
-    .remove-attachment-btn:hover {
-      background-color: rgba(239, 68, 68, 0.2);
-      color: #ef4444;
     }
 
     /* Modal Styles */
@@ -578,7 +490,6 @@
       align-items: center;
       justify-content: center;
       z-index: 1000;
-      animation: fadeIn 0.2s ease-out;
     }
 
     .modal-content {
@@ -587,14 +498,7 @@
       border-radius: 16px;
       width: 90%;
       max-width: 500px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
       overflow: hidden;
-      animation: scaleUp 0.2s ease-out;
-    }
-
-    @keyframes scaleUp {
-      from { transform: scale(0.95); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
     }
 
     .modal-header {
@@ -617,11 +521,6 @@
       color: var(--text-muted);
       font-size: 24px;
       cursor: pointer;
-      transition: color 0.2s;
-    }
-
-    .close-modal-btn:hover {
-      color: var(--text-highlight);
     }
 
     .modal-body {
@@ -629,49 +528,6 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
-    }
-
-    .modal-body p {
-      font-size: 14px;
-      color: var(--text-main);
-    }
-
-    .upgrade-plans {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-
-    .upgrade-plan {
-      background: var(--bg-dark);
-      border: 1px solid var(--border-color);
-      border-radius: 10px;
-      padding: 14px 12px;
-      text-align: center;
-    }
-
-    .upgrade-plan.featured {
-      border-color: var(--accent-color);
-      box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.25);
-    }
-
-    .upgrade-plan h4 {
-      color: var(--text-highlight);
-      font-size: 14px;
-      margin-bottom: 6px;
-    }
-
-    .upgrade-plan strong {
-      display: block;
-      color: var(--accent-color);
-      font-size: 16px;
-      margin-bottom: 8px;
-    }
-
-    .upgrade-plan span {
-      color: var(--text-muted);
-      font-size: 11px;
-      line-height: 1.4;
     }
 
     .modal-textarea {
@@ -686,11 +542,6 @@
       font-size: 14px;
       outline: none;
       resize: none;
-      transition: border-color 0.2s;
-    }
-
-    .modal-textarea:focus {
-      border-color: var(--accent-color);
     }
 
     .modal-footer {
@@ -708,11 +559,6 @@
       font-size: 14px;
       font-weight: 600;
       cursor: pointer;
-      transition: background-color 0.2s, transform 0.1s;
-    }
-
-    .modal-btn:active {
-      transform: scale(0.98);
     }
 
     .modal-btn.primary {
@@ -721,143 +567,13 @@
       border: none;
     }
 
-    .modal-btn.primary:hover {
-      opacity: 0.9;
-    }
-
     .modal-btn.secondary {
       background-color: transparent;
       border: 1px solid var(--border-color);
       color: var(--text-main);
     }
 
-    .modal-btn.secondary:hover {
-      background-color: var(--card-bg);
-      color: var(--text-highlight);
-    }
-
-    /* Image Card in Bubble */
-    .image-card {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-top: 8px;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid var(--border-color);
-      background-color: var(--bg-dark);
-      max-width: 100%;
-      width: 320px;
-    }
-
-    .generated-image {
-      width: 100%;
-      height: auto;
-      object-fit: cover;
-      aspect-ratio: 1;
-      display: block;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .image-card-actions {
-      padding: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .download-img-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--text-highlight);
-      text-decoration: none;
-      font-size: 12px;
-      font-weight: 600;
-      background-color: var(--accent-color);
-      padding: 6px 12px;
-      border-radius: 6px;
-      transition: background-color 0.2s;
-    }
-
-    .download-img-btn:hover {
-      background-color: var(--accent-hover);
-    }
-
-    /* Code Blocks styling */
-    .code-container {
-      background-color: #0b0c10;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      margin: 12px 0;
-      overflow: hidden;
-      font-family: 'Courier New', Courier, monospace;
-    }
-
-    .code-header {
-      background-color: var(--sidebar-bg);
-      padding: 8px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .code-lang {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--text-highlight);
-      text-transform: uppercase;
-      font-family: var(--font-family);
-    }
-
-    .code-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .code-action-btn {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      color: var(--text-main);
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 11px;
-      cursor: pointer;
-      font-family: var(--font-family);
-      transition: background-color 0.2s, color 0.2s;
-    }
-
-    .code-action-btn:hover {
-      background-color: var(--accent-color);
-      color: var(--text-highlight);
-    }
-
-    .code-action-btn.preview-btn {
-      border-color: var(--accent-color);
-      color: var(--accent-color);
-    }
-
-    .code-action-btn.preview-btn:hover {
-      background-color: var(--accent-gradient);
-      color: var(--text-highlight);
-    }
-
-    pre {
-      padding: 16px;
-      overflow-x: auto;
-      margin: 0;
-      background-color: #0b0c10;
-    }
-
-    code {
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 14px;
-      color: #e2e8f0;
-      white-space: pre;
-    }
-
-    /* Auth Screen styling */
+    /* Auth Screen */
     .auth-container {
       position: fixed;
       top: 0;
@@ -879,7 +595,6 @@
       width: 90%;
       max-width: 400px;
       padding: 32px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.5);
       display: flex;
       flex-direction: column;
       gap: 24px;
@@ -909,7 +624,6 @@
       font-weight: 600;
       padding: 12px;
       cursor: pointer;
-      transition: color 0.2s, border-bottom 0.2s;
       border-bottom: 2px solid transparent;
       text-align: center;
     }
@@ -946,11 +660,6 @@
       font-family: var(--font-family);
       font-size: 14px;
       outline: none;
-      transition: border-color 0.2s;
-    }
-
-    .input-group input:focus {
-      border-color: var(--accent-color);
     }
 
     .auth-error-msg {
@@ -964,7 +673,6 @@
       font-weight: 500;
     }
 
-    /* Profile / Logout Section at Bottom of Sidebar */
     .sidebar-footer {
       padding: 16px;
       border-top: 1px solid var(--border-color);
@@ -1014,7 +722,6 @@
       cursor: pointer;
       font-family: var(--font-family);
       font-weight: 600;
-      transition: border-color 0.2s, color 0.2s;
     }
 
     .logout-btn:hover {
@@ -1023,51 +730,108 @@
       background-color: rgba(239, 68, 68, 0.1);
     }
 
-    .settings-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); width: 34px; height: 34px; border-radius: 8px; cursor: pointer; font-size: 18px; }
-    .settings-btn:hover { border-color: var(--accent-color); color: var(--text-highlight); background-color: var(--card-hover); }
-    .settings-screen { position: fixed; inset: 0; z-index: 2500; overflow-y: auto; background: #f7f7f8; color: #17181c; font-family: Arial, sans-serif; }
-    .settings-shell { width: min(900px, calc(100% - 48px)); margin: 72px auto; }
-    .settings-topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 42px; }
-    .settings-brand { display: flex; align-items: center; gap: 12px; font-size: 21px; font-weight: 700; }
-    .settings-brand img { width: 36px; height: 36px; object-fit: contain; }
-    .settings-close { border: 0; background: transparent; color: #555861; font-size: 28px; cursor: pointer; line-height: 1; }
-    .settings-account { margin-bottom: 38px; }
-    .settings-account strong { display: block; font-size: 15px; margin-bottom: 8px; }
-    .settings-account span { color: #667085; font-size: 13px; }
-    .settings-actions { display: flex; gap: 9px; margin-top: 14px; }
-    .settings-actions button { border: 1px solid #d2d4d8; background: #fff; border-radius: 7px; padding: 9px 13px; font-weight: 600; cursor: pointer; }
-    .settings-actions .settings-upgrade { background: #1d2b27; color: #fff; border-color: #1d2b27; }
-    .settings-list { border-top: 1px solid #e2e3e6; }
-    .settings-row { min-height: 68px; padding: 14px 0; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #e2e3e6; }
-    .settings-row-icon { width: 24px; text-align: center; font-size: 19px; color: #111; }
-    .settings-row-copy { flex: 1; min-width: 0; }
-    .settings-row-copy strong { display: block; font-size: 14px; font-weight: 500; margin-bottom: 6px; }
-    .settings-row-copy small { color: #667085; font-size: 13px; }
-    .settings-control { flex: 0 0 auto; }
-    .settings-toggle { width: 32px; height: 20px; appearance: none; border: 0; border-radius: 20px; background: #c4c6ca; position: relative; cursor: pointer; }
-    .settings-toggle::after { content: ""; position: absolute; width: 16px; height: 16px; top: 2px; left: 2px; border-radius: 50%; background: #fff; transition: transform 0.2s; }
-    .settings-toggle:checked { background: #202124; }
-    .settings-toggle:checked::after { transform: translateX(12px); }
-    .settings-input { width: 735px; max-width: 100%; border: 1px solid #d5d7da; border-radius: 8px; padding: 10px 12px; color: #172033; background: #fff; font-size: 13px; }
-    .settings-browse { border: 1px solid #d5d7da; background: #fff; border-radius: 8px; padding: 9px 13px; font-weight: 600; cursor: pointer; }
-    .settings-range { width: 100%; accent-color: #202124; }
-    .settings-scale { display: flex; justify-content: space-between; color: #adb0b6; font-size: 11px; margin-top: 8px; }
-    @media (max-width: 640px) { .settings-shell { width: calc(100% - 32px); margin: 28px auto; } .settings-topbar { margin-bottom: 28px; } .settings-row { align-items: flex-start; } .settings-row-copy small { line-height: 1.4; display: block; } }
+    /* Uptodown Modal Custom */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 16, 21, 0.85);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+    }
+
+    .modal-card {
+      background: var(--sidebar-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 32px;
+      width: 90%;
+      max-width: 420px;
+      position: relative;
+      text-align: center;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .uptodown-tag {
+      background: rgba(0, 202, 154, 0.15);
+      color: #00ca9a;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .security-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 16px 0;
+      color: #00ca9a;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .modal-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn-primary-uptodown {
+      background: var(--accent-gradient);
+      color: white;
+      padding: 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .btn-secondary-uptodown {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .qr-preview-section {
+      margin-top: 20px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .qr-code-img {
+      width: 100px;
+      height: 100px;
+      margin-top: 8px;
+      border-radius: 8px;
+    }
   </style>
-  <!-- Google AdSense Auto Ads -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2523359993935749"
-     crossorigin="anonymous">
-
-
-</script>
 </head>
 <body>
-  <!-- Auth Container (Login / Signup Screen) -->
+
+  <!-- Auth Container -->
   <div id="auth-container" class="auth-container" style="display: none;">
     <div class="auth-card">
       <div class="auth-header">
         <div class="brand" style="justify-content: center; font-size: 24px; margin-bottom: 8px;">
-          <img src="assets/guai_hub_logo.png" alt="GuAI Hub" style="height: 48px; width: auto;">
+          <span>⚡</span> Ask My Local AI
         </div>
         <p id="auth-subtitle" class="auth-subtitle">Log in to access your local offline assistant</p>
       </div>
@@ -1092,52 +856,34 @@
     </div>
   </div>
 
-  <section id="settings-screen" class="settings-screen" style="display: none;" aria-label="GuAI Hub Settings">
-    <div class="settings-shell">
-      <div class="settings-topbar"><div class="settings-brand"><img src="assets/guai_hub_icon.png" alt=""> <span>GuAI Hub Settings</span></div><button class="settings-close" onclick="closeSettings()" aria-label="Close settings">&times;</button></div>
-      <div class="settings-account"><strong id="settings-account-name">Username</strong><span id="settings-account-email">Local GuAI Hub account</span><div class="settings-actions"><button class="settings-upgrade" onclick="openUpgradeModal(); closeSettings();">Upgrade</button><button onclick="closeSettings()">Done</button><button onclick="logout(); closeSettings();">Sign out</button></div></div>
-      <div class="settings-list">
-        <label class="settings-row"><span class="settings-row-icon">☁</span><span class="settings-row-copy"><strong>Cloud</strong><small>Enable cloud models and web search.</small></span><input class="settings-toggle settings-control" type="checkbox" data-setting="cloud" checked></label>
-        <label class="settings-row"><span class="settings-row-icon">⇩</span><span class="settings-row-copy"><strong>Auto-download updates</strong><small>Automatically download updates when available.</small></span><input class="settings-toggle settings-control" type="checkbox" data-setting="autoDownload" checked></label>
-        <label class="settings-row"><span class="settings-row-icon">⌁</span><span class="settings-row-copy"><strong>Expose Ollama to the network</strong><small>Allow other devices or services to access Ollama.</small></span><input class="settings-toggle settings-control" type="checkbox" data-setting="network" checked></label>
-        <div class="settings-row"><span class="settings-row-icon">▰</span><span class="settings-row-copy"><strong>Model location</strong><small>Location where models are stored.</small><div style="display:flex;gap:8px;align-items:center;margin-top:12px;"><input id="settings-model-location" class="settings-input" value="C:\\Users\\patel\\AppData\\Local\\Programs\\Ollama"><button class="settings-browse" onclick="document.getElementById('settings-model-location').focus()">Browse</button></div></span></div>
-        <div class="settings-row"><span class="settings-row-icon">⚙</span><span class="settings-row-copy"><strong>Context length</strong><small>Context length determines how much your conversation local LLMs can remember and use to generate responses.</small><input id="settings-context-length" class="settings-range" type="range" min="4096" max="262144" step="4096" value="32768" oninput="document.getElementById('context-value').textContent = this.value / 1024 + 'k'"><span class="settings-scale"><span>4k</span><span>8k</span><span>16k</span><span id="context-value">32k</span><span>64k</span><span>128k</span><span>256k</span></span></span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Left Sidebar (History Panel) -->
+  <!-- Left Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div class="sidebar-header-content">
-        <div class="brand" style="display: flex; align-items: center; gap: 8px;">
-          <img src="assets/guai_hub_icon.png" alt="GuAI Hub" style="height: 28px; width: auto;">
-          <span style="font-size: 18px; font-weight: 700; color: #ffffff;">GuAI Hub</span>
-        </div>
-        <nav class="auth-nav">
-          <a href="#" class="auth-link" onclick="openAuth('login'); return false;">Sign In</a>
-          <a href="#" class="auth-link" onclick="openAuth('signup'); return false;">Sign Up</a>
-          <a href="#" class="upgrade-link" onclick="openUpgradeModal(); return false;">Upgrade</a>
-        </nav>
+      <div class="brand">
+        <span>⚡</span> Ask My Local AI
       </div>
       <button class="new-chat-btn" onclick="startNewChat()">
         <span>+</span> New Chat
+      </button>
+      <button id="upgrade-btn" class="upgrade-btn" onclick="openUpgradeModal()">Upgrade to Pro</button>
+      <button class="sidebar-uptodown-btn" onclick="openUptodownModal()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+        <span>Get Android App</span>
       </button>
     </div>
     <div class="search-container">
       <input type="text" id="search-history" class="search-input" placeholder="Search past chats..." oninput="filterHistory()">
     </div>
-    <div class="history-list" id="history-list">
-      <!-- Chat history items will load dynamically here -->
-    </div>
+    <div class="history-list" id="history-list"></div>
 
-    <!-- User Profile & Logout at Bottom of Sidebar -->
     <div class="sidebar-footer">
       <div class="user-profile">
         <div class="user-avatar" id="user-avatar-initial">U</div>
         <span class="user-name" id="user-display-name">Username</span>
       </div>
-      <div style="display:flex;gap:8px;align-items:center;"><button class="settings-btn" onclick="openSettings()" title="GuAI Hub Settings" aria-label="GuAI Hub Settings">⚙</button><button class="logout-btn" onclick="logout()">Logout</button></div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
   </aside>
 
@@ -1147,8 +893,469 @@
       <div class="status-badge">
         <div class="status-dot"></div>
         <span style="font-weight: 500; font-size: 13px;">Active Model:</span>
-        <select id="model-select" style="background-color: var(--sidebar-bg); border: 1px solid var(--border-color); color: var(--text-highlight); border-radius: 6px; padding: 4px 8px; font-family: var(--font-family); font-size: 12px; outline: none; cursor: pointer;" onchange="handleModelChange()">
-          <option value="minimax-m3:cloud" selected>minimax-m3:cloud</option>
+        <select id="model-select" style="background-color: var(--sidebar-bg); border: 1px solid var(--border-color); color: var(--text-highlight); border-radius: 6px; padding: 4px 8px; font-family: var(--font-family); font-size: 12px; outline: none; cursor: pointer;" onchange="saveSelectedModel()">
           <option value="phi3:mini">phi3:mini</option>
         </select>
-        <span id="usage-badge" style=
+      </div>
+      <div style="display: flex; gap: 16px; align-items: center;">
+        <div id="quota-display-badge" style="font-size: 12px; font-weight: 500; padding: 5px 12px; background-color: var(--sidebar-bg); border: 1px solid var(--border-color); border-radius: 6px; color: #fbbf24;">
+          Quota: Loading...
+        </div>
+        <div style="font-size: 13px; color: var(--text-muted);">
+          Proxy: localhost:3000
+        </div>
+      </div>
+    </header>
+
+    <div class="chat-container">
+      <div class="chat-messages" id="chat-messages">
+        <div class="chat-empty-state" id="empty-state">
+          <div class="empty-icon">🤖</div>
+          <h2>Welcome to Ask My Local AI</h2>
+          <p>Type a prompt below to chat with your offline assistant in real-time.</p>
+        </div>
+      </div>
+
+      <!-- Input Bar -->
+      <div class="input-bar-container">
+        <div id="attachment-preview" class="attachment-preview" style="display: none;">
+          <div class="attachment-info">
+            <span class="attachment-icon">📄</span>
+            <span id="attachment-name" class="attachment-name">document.txt</span>
+            <span id="attachment-hint" class="attachment-hint"></span>
+          </div>
+          <button class="remove-attachment-btn" onclick="removeAttachment()">&times;</button>
+        </div>
+
+        <div class="input-bar">
+          <input type="file" id="doc-input-element" style="display: none;" onchange="handleFileSelect(event)" accept=".txt,.md,.js,.ts,.html,.css,.json,.py,.java,.cpp,.c,.h,.sh,.bat,.ps1">
+          <input type="file" id="image-input-element" style="display: none;" onchange="handleImageSelect(event)" accept="image/*">
+          
+          <button class="icon-btn" onclick="triggerFileInput()" title="Add Document">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+            </svg>
+          </button>
+
+          <button class="icon-btn" onclick="triggerImageInput()" title="Attach Image for Vision Model">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+          </button>
+
+          <button class="icon-btn" onclick="openImageModal()" title="Create Image">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <circle cx="8.5" cy="8.5" r="1.5"></circle>
+              <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+          </button>
+
+          <input type="text" id="prompt-input" class="chat-input" placeholder="Ask anything..." onkeydown="handleKeyDown(event)">
+          <button class="send-btn" onclick="ask()">Send</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modals -->
+  <div id="image-modal" class="modal" style="display: none;" onclick="if(event.target === this) closeImageModal()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Generate Image</h3>
+        <button class="close-modal-btn" onclick="closeImageModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Describe the image you want to generate:</p>
+        <textarea id="image-prompt" class="modal-textarea" placeholder="e.g., A futuristic city at sunset..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn secondary" onclick="closeImageModal()">Cancel</button>
+        <button class="modal-btn primary" onclick="generateImage()">Generate</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="upgrade-modal" class="modal" style="display: none;" onclick="if(event.target === this) closeUpgradeModal()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Upgrade to Pro</h3>
+        <button class="close-modal-btn" onclick="closeUpgradeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Unlock the Pro plan for your Ask My Local AI account.</p>
+        <div id="paypal-buttons" class="paypal-buttons"></div>
+        <div id="payment-status" class="payment-status">Secure checkout powered by PayPal.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Uptodown Modal -->
+  <div id="uptodown-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <button class="modal-close" onclick="closeUptodownModal()">&times;</button>
+      <div class="uptodown-badge-header">
+        <span class="uptodown-tag">Official Release</span>
+        <h2>Get GuAI Hub for Android</h2>
+        <p class="version-label">Version 1.132.0 • 24.5 MB</p>
+      </div>
+      <div class="security-badge">
+        <span>Verified 100% Virus-Free by Uptodown</span>
+      </div>
+      <div class="modal-actions">
+        <a href="/download/apk" class="btn-primary-uptodown">Direct APK Download</a>
+        <a href="https://guai-hub.en.uptodown.com/android" target="_blank" rel="noopener" class="btn-secondary-uptodown">View on Uptodown Store</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let chatHistory = [];
+    let currentUsername = "";
+    let authMode = "login";
+    let selectedModel = "phi3:mini";
+    let paypalSdkPromise = null;
+    const apiBase = window.location.protocol === "file:" ? "http://localhost:3000" : "";
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const savedUser = localStorage.getItem("chat-username");
+      if (savedUser) {
+        loginUser(savedUser);
+      } else {
+        showAuthScreen();
+      }
+      loadModels();
+    });
+
+    function showAuthScreen() {
+      document.getElementById("auth-container").style.display = "flex";
+      document.getElementById("auth-username").focus();
+    }
+
+    function hideAuthScreen() {
+      document.getElementById("auth-container").style.display = "none";
+    }
+
+    function switchAuthTab(mode) {
+      authMode = mode;
+      const loginTab = document.getElementById("tab-login");
+      const signupTab = document.getElementById("tab-signup");
+      const subtitle = document.getElementById("auth-subtitle");
+      const submitBtn = document.getElementById("auth-submit-btn");
+      const errorDiv = document.getElementById("auth-error");
+      errorDiv.style.display = "none";
+
+      if (mode === "login") {
+        loginTab.classList.add("active");
+        signupTab.classList.remove("active");
+        subtitle.innerText = "Log in to access your local offline assistant";
+        submitBtn.innerText = "Log In";
+      } else {
+        loginTab.classList.remove("active");
+        signupTab.classList.add("active");
+        subtitle.innerText = "Create an account to start chatting";
+        submitBtn.innerText = "Sign Up";
+      }
+    }
+
+    async function submitAuth() {
+      const usernameInput = document.getElementById("auth-username");
+      const passwordInput = document.getElementById("auth-password");
+      const errorDiv = document.getElementById("auth-error");
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value;
+
+      if (!username || !password) {
+        errorDiv.innerText = "Please enter both username and password";
+        errorDiv.style.display = "block";
+        return;
+      }
+
+      const endpoint = authMode === "login" ? "/api/login" : "/api/signup";
+      try {
+        const response = await fetch(`${apiBase}${endpoint}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          usernameInput.value = "";
+          passwordInput.value = "";
+          loginUser(data.username);
+        } else {
+          const errText = await response.text();
+          errorDiv.innerText = errText || "Authentication failed";
+          errorDiv.style.display = "block";
+        }
+      } catch (err) {
+        errorDiv.innerText = "Connection error. Make sure server is running.";
+        errorDiv.style.display = "block";
+      }
+    }
+
+    async function loginUser(username) {
+      currentUsername = username;
+      localStorage.setItem("chat-username", username);
+      document.getElementById("user-display-name").innerText = username;
+      document.getElementById("user-avatar-initial").innerText = username.charAt(0).toUpperCase();
+      hideAuthScreen();
+      startNewChat();
+      loadHistory();
+      updateQuotaDisplay();
+    }
+
+    async function updateQuotaDisplay() {
+      if (!currentUsername) return;
+      try {
+        const res = await fetch(`${apiBase}/api/quota?username=${encodeURIComponent(currentUsername)}`);
+        if (res.ok) {
+          const quota = await res.json();
+          const badge = document.getElementById("quota-display-badge");
+          if (badge) {
+            if (quota.plan === "pro") {
+              badge.innerHTML = `✨ Pro Plan: <strong>Unlimited</strong>`;
+            } else {
+              badge.innerHTML = `Free Quota: <strong>${quota.remaining}/${quota.total} remaining</strong>`;
+            }
+          }
+        }
+      } catch (e) {}
+    }
+
+    function logout() {
+      currentUsername = "";
+      localStorage.removeItem("chat-username");
+      showAuthScreen();
+      document.getElementById("chat-messages").innerHTML = "";
+      document.getElementById("history-list").innerHTML = "";
+    }
+
+    async function loadHistory() {
+      if (!currentUsername) return;
+      try {
+        const response = await fetch(`${apiBase}/history?username=${encodeURIComponent(currentUsername)}`);
+        if (response.ok) {
+          chatHistory = await response.json();
+          renderHistory(chatHistory);
+        }
+      } catch (err) {}
+    }
+
+    function renderHistory(items) {
+      const historyList = document.getElementById("history-list");
+      historyList.innerHTML = "";
+      if (items.length === 0) {
+        historyList.innerHTML = `<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px;">No past chats</div>`;
+        return;
+      }
+      items.forEach((item) => {
+        const div = document.createElement("div");
+        div.className = "history-item";
+        div.onclick = () => showHistoryItem(item);
+        div.innerHTML = `<div class="history-prompt">${escapeHtml(item.prompt)}</div>`;
+        historyList.appendChild(div);
+      });
+    }
+
+    function showHistoryItem(item) {
+      const chatMessages = document.getElementById("chat-messages");
+      const emptyState = document.getElementById("empty-state");
+      if (emptyState) emptyState.style.display = "none";
+      chatMessages.innerHTML = "";
+      appendMessage("user", item.prompt);
+      appendMessage("bot", item.response, null, item.response.includes("class=\"image-card\""));
+    }
+
+    function startNewChat() {
+      const chatMessages = document.getElementById("chat-messages");
+      chatMessages.innerHTML = `
+        <div class="chat-empty-state" id="empty-state">
+          <div class="empty-icon">🤖</div>
+          <h2>Welcome to Ask My Local AI</h2>
+          <p>Type a prompt below to chat with your offline assistant in real-time.</p>
+        </div>
+      `;
+      document.getElementById("prompt-input").focus();
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === "Enter") ask();
+    }
+
+    let attachedDocContent = "";
+    let attachedDocName = "";
+    let attachedImageData = "";
+    let attachedImageName = "";
+
+    function triggerFileInput() { document.getElementById("doc-input-element").click(); }
+    function triggerImageInput() { document.getElementById("image-input-element").click(); }
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      attachedDocName = file.name;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        attachedDocContent = e.target.result;
+        document.getElementById("attachment-name").innerText = attachedDocName;
+        document.getElementById("attachment-preview").style.display = "flex";
+      };
+      reader.readAsText(file);
+    }
+
+    function isVisionModel(model) {
+      return /llava|vision|moondream|bakllava/i.test(model);
+    }
+
+    function handleImageSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      attachedImageName = file.name;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        attachedImageData = e.target.result.split(",")[1];
+        document.getElementById("attachment-name").innerText = attachedImageName;
+        document.getElementById("attachment-preview").style.display = "flex";
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeAttachment() {
+      attachedDocContent = "";
+      attachedImageData = "";
+      document.getElementById("attachment-preview").style.display = "none";
+    }
+
+    async function loadModels() {
+      try {
+        const response = await fetch(`${apiBase}/models`);
+        if (response.ok) {
+          const models = await response.json();
+          const select = document.getElementById("model-select");
+          if (models && models.length > 0) {
+            select.innerHTML = "";
+            models.forEach(model => {
+              const opt = document.createElement("option");
+              opt.value = model;
+              opt.innerText = model;
+              select.appendChild(opt);
+            });
+            const saved = localStorage.getItem("selected-model");
+            if (saved && models.includes(saved)) {
+              select.value = saved;
+              selectedModel = saved;
+            } else {
+              selectedModel = select.value;
+            }
+          }
+        }
+      } catch (err) {}
+    }
+
+    function saveSelectedModel() {
+      selectedModel = document.getElementById("model-select").value;
+      localStorage.setItem("selected-model", selectedModel);
+    }
+
+    async function ask() {
+      const promptInput = document.getElementById("prompt-input");
+      const userPrompt = promptInput.value.trim() || (attachedImageData ? "Describe this image." : "Analyze document.");
+      promptInput.value = "";
+
+      const docsToSend = attachedDocContent;
+      const imageToSend = attachedImageData;
+      removeAttachment();
+
+      document.getElementById("empty-state").style.display = "none";
+      appendMessage("user", userPrompt);
+
+      const botMessageId = "bot-msg-" + Date.now();
+      appendMessage("bot", "Thinking...", botMessageId);
+      const botContentEl = document.getElementById(botMessageId).querySelector(".message-content");
+
+      try {
+        const bodyData = { username: currentUsername, model: selectedModel, prompt: userPrompt };
+        if (docsToSend) bodyData.documents = docsToSend;
+        if (imageToSend) bodyData.images = [imageToSend];
+
+        const response = await fetch(`${apiBase}/ask`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(bodyData)
+        });
+
+        if (!response.ok) {
+          botContentEl.innerText = "Error: " + (await response.text());
+          return;
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let responseText = "";
+        botContentEl.innerText = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          for (const line of chunk.split("\n")) {
+            if (line.trim()) {
+              try {
+                const parsed = JSON.parse(line);
+                if (parsed.response) {
+                  responseText += parsed.response;
+                  botContentEl.innerText = responseText;
+                }
+              } catch (e) {}
+            }
+          }
+        }
+        loadHistory();
+        updateQuotaDisplay();
+      } catch (err) {
+        botContentEl.innerText = "Error: Failed to stream response.";
+      }
+    }
+
+    function appendMessage(sender, text, id = null, isHtml = false) {
+      const chatMessages = document.getElementById("chat-messages");
+      const messageDiv = document.createElement("div");
+      messageDiv.className = `message ${sender}`;
+      if (id) messageDiv.id = id;
+
+      const avatarDiv = document.createElement("div");
+      avatarDiv.className = "avatar";
+      avatarDiv.innerText = sender === "user" ? "U" : "AI";
+
+      const bubbleDiv = document.createElement("div");
+      bubbleDiv.className = "bubble";
+      const contentDiv = document.createElement("div");
+      contentDiv.className = "message-content";
+      
+      if (isHtml) contentDiv.innerHTML = text;
+      else contentDiv.innerText = text;
+
+      bubbleDiv.appendChild(contentDiv);
+      messageDiv.appendChild(avatarDiv);
+      messageDiv.appendChild(bubbleDiv);
+      chatMessages.appendChild(messageDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function escapeHtml(unsafe) {
+      return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function openUptodownModal() { document.getElementById("uptodown-modal").style.display = "flex"; }
+    function closeUptodownModal() { document.getElementById("uptodown-modal").style.display = "none"; }
+    function openImageModal() { document.getElementById("image-modal").style.display = "flex"; }
+    function closeImageModal() { document.getElementById("image-modal").style.display = "none"; }
+    function openUpgradeModal() { document.getElementById("upgrade-modal").style.display = "flex"; }
+    function closeUpgradeModal() { document.getElementById("upgrade-modal").style.display = "none"; }
+  </script>
+</body>
+</html>
